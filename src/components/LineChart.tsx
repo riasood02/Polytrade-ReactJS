@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Chart as ChartJS,
@@ -11,7 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { xVal, yVal } from "../Utils/ApiFetch";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -25,12 +24,12 @@ ChartJS.register(
  * Create Line Chart with the data fetched from API
  */
 const LineChart = () => {
-  const LineData1 = {
+  const [LineData, setLineData] = useState<{ [key: string]: any }>({
     data: {
-      labels: xVal,
+      labels: [],
       datasets: [
         {
-          data: yVal,
+          data: [],
           backgroundColor: "white",
           borderColor: "grey",
         },
@@ -54,11 +53,93 @@ const LineChart = () => {
         },
       },
     },
-  };
+  });
+  useEffect(() => {
+    const APIFetchData = () => {
+      let chartValues = new Map();
+      let xVal: string[] = [];
+      let yVal: Number[] = [];
+      var totalInv = 0;
+      const url = "https://api.polytrade.app/invoice-funded";
+      fetch(url, {
+        method: "GET",
+      })
+        .then((data) => {
+          const res = data.json();
+          return res;
+        })
+        .then((res) => {
+          var apiData = res.data;
+          const sortbyDate = (a: any, b: any) => {
+            return (
+              new Date(a.disbursedDate).valueOf() -
+              new Date(b.disbursedDate).valueOf()
+            );
+          };
+          const len: Number = apiData.length;
+          for (var i = 0; i < len; i++) {
+            const d = new Date(apiData[i].disbursedDate);
+            const dt =
+              d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+            apiData[i].disbursedDate = dt;
+            const invoice_amount = parseFloat(apiData[i].invoiceAmount);
+            totalInv += invoice_amount;
+            if (chartValues.has(apiData[i].disbursedDate) === true) {
+              const initialInvoice = chartValues.get(apiData[i].disbursedDate);
+              chartValues.set(
+                apiData[i].disbursedDate,
+                initialInvoice + invoice_amount
+              );
+            } else {
+              chartValues.set(apiData[i].disbursedDate, invoice_amount);
+            }
+          }
+          apiData.sort(sortbyDate);
 
+          chartValues.forEach((values, keys) => {
+            xVal.push(keys);
+            yVal.push(values);
+          });
+          setLineData({
+            data: {
+              labels: xVal,
+              datasets: [
+                {
+                  data: yVal,
+                  backgroundColor: "white",
+                  borderColor: "grey",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              scales: {
+                y: {
+                  grid: {
+                    display: false,
+                  },
+                  ticks: {
+                    display: false,
+                  },
+                },
+                x: {
+                  grid: {
+                    display: false,
+                  },
+                },
+              },
+            },
+          });
+        })
+        .catch((e) => {
+          console.log("error", e);
+        });
+    };
+    APIFetchData();
+  }, []);
   return (
     <div>
-      <Line data={LineData1.data} options={LineData1.options}></Line>
+      <Line data={LineData.data} options={LineData.options}></Line>
     </div>
   );
 };

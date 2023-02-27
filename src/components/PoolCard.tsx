@@ -6,7 +6,7 @@ import info from "../svgs/info.svg";
  * Pool Cards
  * @param {object} props Component props
  * @param {string} props.im relative path for the image
- * @param {string} props.txt1 headline
+ * @param {number} props.txt1 headline
  * @param {string} props.txt2 value
  */
 const PoolCard = ({
@@ -15,7 +15,7 @@ const PoolCard = ({
   txt2,
 }: {
   im: string;
-  txt1: string;
+  txt1: number | undefined;
   txt2: string;
 }) => {
   return (

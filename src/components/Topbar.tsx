@@ -7,11 +7,74 @@ import notification from "../svgs/notification.svg";
 import audited from "../svgs/audited.svg";
 import profile from "../svgs/profile_dp.svg";
 import ConnectWallet from "./ConnectWallet";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Button, ButtonGroup, Dropdown } from "react-bootstrap";
+import Web3 from "web3";
+import meta from "../svgs/metamask.svg";
 /**
  * Top Navigation bar
  */
-const Topbar = () => {
+const Topbar = (props: {
+  alert: {
+    message: string | null;
+    type: string | null;
+  };
+  showAlert: (message: string | null, type: string | null) => void;
+}) => {
+  const [isConnected, setisConnected] = useState(false);
+  const [currentAccount, setcurrentAccount] = useState<string | null>();
+  const [provider, setProvider] = useState((window as any).ethereum);
+  const [chainId, setChainId] = useState<Number>();
+  const [web3, setWeb3] = useState<Web3 | null>();
+
+  const onConnecting = async (provider: any) => {
+    const web3 = new Web3(provider);
+    const accounts: string[] = await web3!.eth.getAccounts();
+    const chainId = await web3!.eth.getChainId();
+    if (accounts.length === 0) {
+      console.log("please connect to metamask");
+      props.showAlert("Metamask not connected", "danger");
+    } else if (accounts[0] !== currentAccount) {
+      setProvider(provider);
+      setWeb3(web3);
+      setChainId(chainId);
+      setcurrentAccount(accounts[0]);
+      setisConnected(true);
+      props.showAlert("Wallet connected", "success");
+    }
+  };
+  const onDisconnecting = () => {
+    setisConnected(false);
+  };
+  useEffect(() => {
+    const handleAccountsChanged = async (accounts: string[]) => {
+      const web3Accounts = await web3!.eth.getAccounts();
+      if (accounts.length === 0) {
+        onLogout();
+      } else if (accounts[0] !== currentAccount) {
+        setcurrentAccount(accounts[0]);
+      }
+    };
+    const handleChainChanged = async (chainId: string) => {
+      const web3ChainId = await web3!.eth.getChainId();
+      setChainId(web3ChainId);
+    };
+    if (isConnected) {
+      provider.on("accountChanged", handleAccountsChanged);
+      provider.on("chainChanged", handleChainChanged);
+    }
+    return () => {
+      if (isConnected) {
+        provider.removeListener("accountChanged", handleAccountsChanged);
+        provider.removeListener("chainChanged", handleChainChanged);
+      }
+    };
+  }, [isConnected]);
+  const onLogout = () => {
+    setisConnected(false);
+    setcurrentAccount(null);
+    props.showAlert("Wallet Disconnected", "warning");
+  };
   return (
     <Navbar
       className="d-flex justify-content-between p-3"
@@ -43,7 +106,43 @@ const Topbar = () => {
                 alt="notification"
               ></Image>
               <Image fluid className="px-2" src={audited} alt="audited"></Image>
-              <ConnectWallet />
+              {!isConnected && (
+                <ConnectWallet
+                  onConnecting={onConnecting}
+                  onDisconnecting={onDisconnecting}
+                />
+              )}
+              {isConnected && (
+                <Dropdown
+                  as={ButtonGroup}
+                  style={{
+                    color: "rgb(10,11,32)",
+                    backgroundColor: "rgb(244,248,251)",
+                    fontWeight: "500",
+                    alignItems: "center",
+                  }}
+                  className="rounded-pill"
+                >
+                  <Image
+                    className="px-2"
+                    style={{ height: "20px" }}
+                    src={meta}
+                  />
+                  <Button variant="default">
+                    <>{currentAccount}</>
+                  </Button>
+
+                  <Dropdown.Toggle
+                    split
+                    variant="default"
+                    id="dropdown-split-basic"
+                  />
+
+                  <Dropdown.Menu className="rounded-pill">
+                    <Dropdown.Item onClick={onLogout}>Disconnect</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
               <Image className="px-2" rounded src={profile}></Image>
               <NavDropdown
                 title="messilionel@gmail.com"

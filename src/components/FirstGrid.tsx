@@ -10,11 +10,20 @@ import Image from "react-bootstrap/Image";
 import { Button, ButtonGroup, Col, Container, Row } from "react-bootstrap";
 import SecondGrid from "./SecondGrid";
 import PoolCard from "./PoolCard";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getStableBalance } from "./Utils/SmartContractFunction";
 /**
  * First Pool Grid
  */
 const FirstGrid = () => {
+  const [stableBalance, setStableBalance] = useState<number>();
+  useEffect(() => {
+    const callStableBalance = async () => {
+      const result = await getStableBalance();
+      setStableBalance(result);
+    };
+    callStableBalance();
+  }, []);
   return (
     <Col sm={12} md={8} className="mt-3">
       <div className="d-flex justify-content-between">
@@ -73,22 +82,22 @@ const FirstGrid = () => {
         <Container className="py-2">
           <Row className="gy-3 gx-3 mx-1">
             <div className="d-md-flex gap-3 justify-content-evenly">
-              <PoolCard im={lock} txt1="100 USDC" txt2="Min Locked Amount" />
+              <PoolCard im={lock} txt1={0} txt2="Min Locked Amount" />
               <PoolCard
                 im={filled}
-                txt1="9,876,543 USDC"
+                txt1={9876543}
                 txt2="Current Pool Liquidity"
               />
-              <PoolCard im={stable} txt1="12%" txt2="Fixed APR" />
+              <PoolCard im={stable} txt1={stableBalance} txt2="Fixed APR" />
             </div>
             <div className="d-md-flex gap-3 justify-content-evenly">
-              <PoolCard im={bonus} txt1="12%" txt2="Bonus Rewards" />
+              <PoolCard im={bonus} txt1={12} txt2="Bonus Rewards" />
               <PoolCard
                 im={total}
-                txt1="1"
+                txt1={1}
                 txt2="Total numer of invoices funded"
               />
-              <PoolCard im={tstable} txt1="375,481" txt2="T-Stable Balance" />
+              <PoolCard im={tstable} txt1={375481} txt2="T-Stable Balance" />
             </div>
           </Row>
           <div className="d-flex gap-1 align-items-center m-3">

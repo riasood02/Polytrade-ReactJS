@@ -1,6 +1,7 @@
 import React from "react";
 import Badge from "../svgs/Badge.svg";
 import Image from "react-bootstrap/Image";
+import "../style.css";
 import {
   Button,
   ButtonGroup,
@@ -82,12 +83,7 @@ const ThirdGrid = () => {
           </div>
           <div>
             <Button
-              style={{
-                backgroundColor: "rgb(118,140,250)",
-                fontWeight: "700",
-                minWidth: "150px",
-              }}
-              className="text-white rounded-pill"
+              className="button-dark text-white rounded-pill"
               variant="default"
             >
               Continue KYC

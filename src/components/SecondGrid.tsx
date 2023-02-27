@@ -10,8 +10,8 @@ const SecondGrid = () => {
       <Container>
         <Row className="gx-4 justify-content-between">
           <div className="d-md-flex gap-3 justify-content-around">
-            <TradeCard txt1="9,582 USDC" txt2="My Stable Interest" />
-            <TradeCard txt1="884 TRADE" txt2="My Bonus Rewards" />
+            <TradeCard FirstText="9,582 USDC" SecondText="My Stable Interest" />
+            <TradeCard FirstText="884 TRADE" SecondText="My Bonus Rewards" />
           </div>
         </Row>
       </Container>

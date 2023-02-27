@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
+import "../style.css";
 /**
  * Connecting Metamask Wallet
  */
@@ -32,12 +33,7 @@ const ConnectWallet = () => {
   if (ethereumAccount === null) {
     return isMetamaskInstalled ? (
       <Button
-        style={{
-          color: "rgb(10,11,32)",
-          backgroundColor: "rgb(244,248,251)",
-          fontWeight: "500",
-        }}
-        className="rounded-pill"
+        className="button-light rounded-pill"
         variant="default"
         onClick={connectMetamaskWallet}
       >

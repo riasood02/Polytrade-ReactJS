@@ -14,6 +14,44 @@ import Image from "react-bootstrap/Image";
  * Side Navigation Bar
  */
 const Sidebar = () => {
+  const links = [
+    {
+      image: home,
+      alt: "home",
+      text: "Home",
+      link: "/home",
+    },
+    {
+      image: Activity,
+      alt: "Activity",
+      text: "World of T-Stable",
+      link: "/Activity",
+    },
+    {
+      image: Asset,
+      alt: "asset",
+      text: "Borrow",
+      link: "/Asset",
+    },
+    {
+      image: Wallet,
+      alt: "wallet",
+      text: "Wallet",
+      link: "/wallet",
+    },
+    {
+      image: History,
+      alt: "history",
+      text: "History",
+      link: "/history",
+    },
+    {
+      image: Profile,
+      alt: "profile",
+      text: "Profile",
+      link: "/profile",
+    },
+  ];
   return (
     <div className="p-1">
       <div>
@@ -24,36 +62,13 @@ const Sidebar = () => {
       </div>
 
       <Nav defaultActiveKey="/home" className="flex-column">
-        <Nav.Link href="/home">
-          <Image src={home} alt="home"></Image>
-          <br />
-          <p className="fs-6 text-muted">Home</p>
-        </Nav.Link>
-        <Nav.Link eventKey="link-1">
-          <Image src={Activity} alt="Activity"></Image>
-          <br />
-          <p className="fs-6 text-muted">World of T-Stable</p>
-        </Nav.Link>
-        <Nav.Link eventKey="link-2">
-          <Image src={Asset} alt="asset"></Image>
-          <br />
-          <p className="fs-6 text-muted">Borrow</p>
-        </Nav.Link>
-        <Nav.Link eventKey="link-2">
-          <Image src={Wallet} alt="wallet"></Image>
-          <br />
-          <p className="fs-6 text-muted">Wallet</p>
-        </Nav.Link>
-        <Nav.Link eventKey="link-2">
-          <Image src={History} alt="history"></Image>
-          <br />
-          <p className="fs-6 text-muted">History</p>
-        </Nav.Link>
-        <Nav.Link eventKey="link-2" className="p-2">
-          <Image src={Profile} alt="profile"></Image>
-          <br />
-          <p className="fs-6 text-muted">Profile</p>
-        </Nav.Link>
+        {links.map((link) => (
+          <Nav.Link eventKey={link.link}>
+            <Image src={link.image} alt={link.alt}></Image>
+            <br />
+            <p className="fs-6 text-muted">{link.text}</p>
+          </Nav.Link>
+        ))}
       </Nav>
     </div>
   );

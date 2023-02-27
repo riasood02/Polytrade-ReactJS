@@ -1,0 +1,39 @@
+.App {
+    text-align: center;
+  }
+.main-body {
+    background-color: rgb(244,248,251);
+    min-height: calculateNewValue(100vh-115px);
+    color: rgb(10,11,32);
+    border-top-left-radius: 46px;
+
+}
+.button-light {
+    color: rgb(10,11,32);
+    background-color: rgb(244,248,251);
+    font-weight: 500;
+
+}
+.radio-group-button {
+    border-top-left-radius: 46px;
+    border-bottom-left-radius: 46px;
+}
+.link-style {
+    text-decoration: none;
+    font-weight: 500;
+}
+.button-dark {
+    background-color: rgb(118,140,250);
+    font-weight: 700;
+    min-width: 150px;
+}
+.circle-icon {
+    background: linear-gradient(
+      46.48deg,
+      #edddeb -2.88%,
+      #a2a5f4 52.25%,
+      #98b8ef 105.13%
+    );
+    padding: 10px;
+    border-radius: 45px;
+  }

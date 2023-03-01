@@ -11,18 +11,27 @@ import { Button, ButtonGroup, Col, Container, Row } from "react-bootstrap";
 import SecondGrid from "./SecondGrid";
 import PoolCard from "./PoolCard";
 import React, { useEffect, useState } from "react";
-import { getStableBalance } from "./Utils/SmartContractFunction";
+import {
+  getRewardBalance,
+  getStableBalance,
+} from "../Utils/SmartContractFunction";
 /**
  * First Pool Grid
  */
 const FirstGrid = () => {
   const [stableBalance, setStableBalance] = useState<number>();
+  const [rewardBalance, setRewardBalance] = useState<number>();
   useEffect(() => {
     const callStableBalance = async () => {
       const result = await getStableBalance();
       setStableBalance(result);
     };
+    const callRewardBalance = async () => {
+      const result = await getRewardBalance();
+      setRewardBalance(result);
+    };
     callStableBalance();
+    callRewardBalance();
   }, []);
   return (
     <Col sm={12} md={8} className="mt-3">
@@ -91,7 +100,7 @@ const FirstGrid = () => {
               <PoolCard im={stable} txt1={stableBalance} txt2="Fixed APR" />
             </div>
             <div className="d-md-flex gap-3 justify-content-evenly">
-              <PoolCard im={bonus} txt1={12} txt2="Bonus Rewards" />
+              <PoolCard im={bonus} txt1={rewardBalance} txt2="Bonus Rewards" />
               <PoolCard
                 im={total}
                 txt1={1}

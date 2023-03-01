@@ -11,7 +11,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { APIFetchData } from "../Utils/FetchAPI";
+import { APIFetchData } from "../../Utils/FetchAPI";
 ChartJS.register(
   CategoryScale,
   LinearScale,

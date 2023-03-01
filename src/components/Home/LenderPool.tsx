@@ -1,21 +1,22 @@
-import lock from "../svgs/Lock.svg";
-import filled from "../svgs/filled_amount_2.svg";
-import stable from "../svgs/stable.svg";
-import bonus from "../svgs/bonus.svg";
-import total from "../svgs/Total.svg";
-import tstable from "../svgs/T-Stable.svg";
-import usdc from "../svgs/usdc.svg";
-import info from "../svgs/info.svg";
+import lock from "../../svgs/Lock.svg";
+import filled from "../../svgs/filled_amount_2.svg";
+import stable from "../../svgs/stable.svg";
+import bonus from "../../svgs/bonus.svg";
+import total from "../../svgs/Total.svg";
+import tstable from "../../svgs/T-Stable.svg";
+import usdc from "../../svgs/usdc.svg";
+import info from "../../svgs/info.svg";
 import Image from "react-bootstrap/Image";
 import { Button, ButtonGroup, Col, Container, Row } from "react-bootstrap";
-import SecondGrid from "./SecondGrid";
 import PoolCard from "./PoolCard";
 import React from "react";
-import "../style.css";
+import "../../style.css";
+import RewardsPool from "./RewardsPool";
+
 /**
  * First Pool Grid
  */
-const FirstGrid = () => {
+const LenderPool = () => {
   return (
     <Col sm={12} md={8} className="mt-3">
       <div className="d-flex justify-content-between">
@@ -95,9 +96,9 @@ const FirstGrid = () => {
           </div>
         </Container>
       </div>
-      <SecondGrid />
+      <RewardsPool />
     </Col>
   );
 };
 
-export default FirstGrid;
+export default LenderPool;

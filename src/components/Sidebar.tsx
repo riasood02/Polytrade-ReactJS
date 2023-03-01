@@ -10,6 +10,7 @@ import Profile from "../svgs/Profile.svg";
 import symbol from "../svgs/Group 1179.svg";
 import logo from "../svgs/logo.svg";
 import Image from "react-bootstrap/Image";
+import { Link } from "react-router-dom";
 /**
  * Side Navigation Bar
  */
@@ -19,7 +20,7 @@ const Sidebar = () => {
       image: home,
       alt: "home",
       text: "Home",
-      link: "/home",
+      link: "/",
     },
     {
       image: Activity,
@@ -66,7 +67,9 @@ const Sidebar = () => {
           <Nav.Link eventKey={link.link}>
             <Image src={link.image} alt={link.alt}></Image>
             <br />
-            <p className="fs-6 text-muted">{link.text}</p>
+            <Link to={link.link} className="fs-6 text-muted">
+              {link.text}
+            </Link>
           </Nav.Link>
         ))}
       </Nav>

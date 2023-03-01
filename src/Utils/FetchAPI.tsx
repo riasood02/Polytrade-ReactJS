@@ -1,4 +1,5 @@
-export const APIFetchData = fetch("https://api.polytrade.app/invoice-funded", {
+import { BaseUrl } from "../Data/Urls";
+export const APIFetchData = fetch(`${BaseUrl}invoice-funded`, {
   method: "GET",
 })
   .then((data) => {
@@ -6,5 +7,5 @@ export const APIFetchData = fetch("https://api.polytrade.app/invoice-funded", {
     return res;
   })
   .catch((e) => {
-    console.log("error", e);
+    throw e;
   });

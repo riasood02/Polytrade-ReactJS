@@ -1,7 +1,7 @@
 import React from "react";
-import Badge from "../svgs/Badge.svg";
+import Badge from "../../svgs/Badge.svg";
 import Image from "react-bootstrap/Image";
-import "../style.css";
+import "../../style.css";
 import {
   Button,
   ButtonGroup,
@@ -32,7 +32,7 @@ const LiquidityCard = (props: { txt1: string; txt2: string }) => {
 /**
  * Third Grid
  */
-const ThirdGrid = () => {
+const OverviewPool = () => {
   return (
     <Col md={4}>
       <div className="d-flex justify-content-between">
@@ -96,4 +96,4 @@ const ThirdGrid = () => {
   );
 };
 
-export default ThirdGrid;
+export default OverviewPool;

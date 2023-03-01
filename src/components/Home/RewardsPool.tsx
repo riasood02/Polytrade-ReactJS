@@ -4,7 +4,7 @@ import TradeCard from "./TradeCard";
 /**
  * second grid
  */
-const SecondGrid = () => {
+const RewardsPool = () => {
   return (
     <div className="my-4 bg-transparent">
       <Container>
@@ -18,4 +18,4 @@ const SecondGrid = () => {
     </div>
   );
 };
-export default SecondGrid;
+export default RewardsPool;

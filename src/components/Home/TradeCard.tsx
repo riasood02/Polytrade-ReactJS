@@ -1,8 +1,8 @@
 import React from "react";
 import { Button, Col } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
-import info from "../svgs/info.svg";
-import "../style.css";
+import info from "../../svgs/info.svg";
+import "../../style.css";
 /**
  * Trade Card
  * @param {object} props Component props

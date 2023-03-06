@@ -9,8 +9,8 @@ import profile from "../svgs/profile_dp.svg";
 import ConnectWallet from "./ConnectWallet";
 import React, { useEffect, useState } from "react";
 import { Button, ButtonGroup, Dropdown } from "react-bootstrap";
-import Web3 from "web3";
 import meta from "../svgs/metamask.svg";
+import Web3 from "web3";
 /**
  * Top Navigation bar
  */

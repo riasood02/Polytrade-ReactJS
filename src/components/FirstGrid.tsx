@@ -12,6 +12,7 @@ import SecondGrid from "./SecondGrid";
 import PoolCard from "./PoolCard";
 import React, { useEffect, useState } from "react";
 import {
+  getCurrentPoolLiquidity,
   getRewardBalance,
   getStableBalance,
 } from "../Utils/SmartContractFunction";
@@ -21,6 +22,7 @@ import {
 const FirstGrid = () => {
   const [stableBalance, setStableBalance] = useState<number>();
   const [rewardBalance, setRewardBalance] = useState<number>();
+  const [PoolLiquidity, setPoolLiquidity] = useState<number>();
   useEffect(() => {
     const callStableBalance = async () => {
       const result = await getStableBalance();
@@ -30,6 +32,11 @@ const FirstGrid = () => {
       const result = await getRewardBalance();
       setRewardBalance(result);
     };
+    const callLiquidityBalance = async () => {
+      const result = await getCurrentPoolLiquidity();
+      setPoolLiquidity(result);
+    };
+    callLiquidityBalance();
     callStableBalance();
     callRewardBalance();
   }, []);
@@ -94,7 +101,7 @@ const FirstGrid = () => {
               <PoolCard im={lock} txt1={0} txt2="Min Locked Amount" />
               <PoolCard
                 im={filled}
-                txt1={9876543}
+                txt1={PoolLiquidity}
                 txt2="Current Pool Liquidity"
               />
               <PoolCard im={stable} txt1={stableBalance} txt2="Fixed APR" />

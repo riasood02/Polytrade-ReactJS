@@ -20,7 +20,7 @@ const PoolCard = ({
 }) => {
   return (
     <Col md={4} className="bg-light p-3 rounded-4">
-      <div className="d-flex align-items-start">
+      <div className="d-flex align-items-start overflow-hidden">
         <Image
           className="mt-2"
           style={{
@@ -33,13 +33,13 @@ const PoolCard = ({
           src={im}
         ></Image>
       </div>
-      <div className="d-flex align-items-start">
+      <div className="d-flex align-items-start overflow-hidden">
         <h2 className="py-1 text-align-start">
           <b>{txt1}</b>
         </h2>
       </div>
 
-      <div className="d-flex gap-1 align-items-start">
+      <div className="d-flex gap-1 align-items-start overflow-hidden">
         <p className="fs-6 mb-0 text-muted">{txt2}</p>
         <Image src={info} />
       </div>

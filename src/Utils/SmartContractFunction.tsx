@@ -2,7 +2,6 @@ import StableContract from "./StableContract";
 import RewardContract from "./RewardContract";
 import PoolLiquidityContract from "./PoolLiquidityContract";
 import { BigNumberish, ethers, formatUnits } from "ethers";
-import BigNumber from "bignumber.js";
 const toDecimal = (value: BigNumberish, decimal: number) =>
   Number(ethers.formatUnits(value, decimal));
 export const getStableBalance = async () => {
@@ -18,7 +17,7 @@ export const getStableBalance = async () => {
 
 export const getRewardBalance = async () => {
   let response = await RewardContract.methods.getReward().call();
-  //console.log(response);
+  console.log(response);
   const balance = toDecimal(response, 2);
   return balance;
 };

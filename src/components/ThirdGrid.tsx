@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Badge from "../svgs/Badge.svg";
 import Image from "react-bootstrap/Image";
 import {
@@ -9,6 +9,9 @@ import {
   DropdownButton,
 } from "react-bootstrap";
 import LineChart from "./LineChart";
+import BeforeKYC from "./BeforeKYC";
+import AfterKYC from "./AfterKYC";
+import Web3 from "web3";
 /**
  * Liquidity card
  * @param {object} props Component props
@@ -32,6 +35,44 @@ const LiquidityCard = (props: { txt1: string; txt2: string }) => {
  * Third Grid
  */
 const ThirdGrid = () => {
+  const [isConnected, setisConnected] = useState(false);
+  const [currentAccount, setcurrentAccount] = useState<string | null>();
+  const [provider, setProvider] = useState((window as any).ethereum);
+  const [chainId, setChainId] = useState<Number>();
+  const [web3, setWeb3] = useState<Web3 | null>();
+  const onConnecting = async (provider: any) => {
+    const web3 = new Web3(provider);
+    const accounts: string[] = await web3!.eth.getAccounts();
+    const chainId = await web3!.eth.getChainId();
+    if (accounts.length === 0) {
+      console.log("please connect to metamask");
+    } else if (accounts[0] !== currentAccount) {
+      setProvider(provider);
+      setWeb3(web3);
+      setChainId(chainId);
+      setcurrentAccount(accounts[0]);
+      setisConnected(true);
+    }
+  };
+  const onDisconnecting = () => {
+    setisConnected(false);
+  };
+
+  useEffect(() => {
+    async function WalletConnected() {
+      const accounts = await (window as any).ethereum.request({
+        method: "eth_accounts",
+      });
+      if (accounts.length) {
+        setisConnected(true);
+        console.log("connected");
+      } else {
+        setisConnected(false);
+        console.log("not connected");
+      }
+    }
+    WalletConnected();
+  }, []);
   return (
     <Col md={4}>
       <div className="d-flex justify-content-between">
@@ -59,43 +100,7 @@ const ThirdGrid = () => {
         txt2="$17,683,857,723"
       ></LiquidityCard>
       <LiquidityCard txt1="Total Invoice Funded" txt2="$24,00"></LiquidityCard>
-      <Col md={12} className="mt-2 p-3 bg-white rounded-4">
-        <div className="d-flex justify-content-between align-items-start">
-          <div className="gap-1">
-            <p className="fs-6 text-muted lh-sm">My Deposits</p>
-            <h6 className=" d-flex align-items-start lh-sm">$24000</h6>
-          </div>
-          <div>
-            <Image src={Badge} alt="badge" />
-          </div>
-        </div>
-        <div className="d-flex  mt-2">
-          <div className="d-flex flex-grow-1 gap-3">
-            <div>
-              <p className="fs-6 text-muted lh-sm">Verification Limit</p>
-              <h6 className="d-flex align-items-start lh-sm">$84,272</h6>
-            </div>
-            <div>
-              <p className="fs-6 text-muted lh-sm">Provider</p>
-              <h6 className="d-flex align-items-start lh-sm">Synaps</h6>
-            </div>
-          </div>
-          <div>
-            <Button
-              style={{
-                backgroundColor: "rgb(118,140,250)",
-                fontWeight: "700",
-                minWidth: "150px",
-              }}
-              className="text-white rounded-pill"
-              variant="default"
-            >
-              Continue KYC
-            </Button>
-            <p className="text-center text-muted">Learn more</p>
-          </div>
-        </div>
-      </Col>
+      {isConnected ? <AfterKYC /> : <BeforeKYC />}
     </Col>
   );
 };

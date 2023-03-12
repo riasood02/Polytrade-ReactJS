@@ -3,6 +3,9 @@ import { Button, Col } from "react-bootstrap";
 import Badge from "../svgs/Badge.svg";
 import Image from "react-bootstrap/Image";
 
+/**
+ * BeforeKYC Status
+ */
 const BeforeKYC = () => {
   return (
     <Col md={12} className="mt-2 p-3 bg-white rounded-4">

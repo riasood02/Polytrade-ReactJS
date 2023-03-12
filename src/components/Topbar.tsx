@@ -11,26 +11,48 @@ import React, { useEffect, useState } from "react";
 import { Button, ButtonGroup, Dropdown } from "react-bootstrap";
 import meta from "../svgs/metamask.svg";
 import Web3 from "web3";
+import { switchNetwork } from "../Utils/SwitchNetwork";
+
 /**
- * Top Navigation bar
+ * Top Navigation Bar
+ * @param {object} props Component props
+ * @param {(address: string | null | undefined) => void} props.showCurrentAccount current wallet address
+ * @param {boolean} props.meta is metamask connected
+ * @param {(b: boolean) => void} props.showMeta function to set props.meta
+ * @param {{ message: string | null; type: string | null;}} props.showAlert alert with message and its type
+ * @param {(message: string | null, type: string | null) => void} props.showAlert function to set alert
+ * @param {(bal: string | undefined) => void} props.showcurrentBalance displays current wallet balance
  */
+
 const Topbar = (props: {
+  showCurrentAccount: (address: string | null | undefined) => void;
+  meta: boolean;
+  showMeta: (b: boolean) => void;
   alert: {
     message: string | null;
     type: string | null;
   };
   showAlert: (message: string | null, type: string | null) => void;
+  showcurrentBalance: (bal: string | undefined) => void;
 }) => {
   const [isConnected, setisConnected] = useState(false);
-  const [currentAccount, setcurrentAccount] = useState<string | null>();
+  const [currentAccount, setcurrentAccount] = useState<string>("none");
+  const [currentBalance, setcurrentBalance] = useState<string>();
   const [provider, setProvider] = useState((window as any).ethereum);
   const [chainId, setChainId] = useState<Number>();
   const [web3, setWeb3] = useState<Web3 | null>();
+
+  /**
+   * Setting states on wallet connect
+   * @param {any} provider displays current wallet balance
+   */
 
   const onConnecting = async (provider: any) => {
     const web3 = new Web3(provider);
     const accounts: string[] = await web3!.eth.getAccounts();
     const chainId = await web3!.eth.getChainId();
+    const balance = await web3!.eth.getBalance(accounts[0]);
+    let mainBalance = web3!.utils.fromWei(balance);
     if (accounts.length === 0) {
       console.log("please connect to metamask");
       props.showAlert("Metamask not connected", "danger");
@@ -40,40 +62,72 @@ const Topbar = (props: {
       setChainId(chainId);
       setcurrentAccount(accounts[0]);
       setisConnected(true);
+      setcurrentBalance(mainBalance);
+      props.showcurrentBalance(mainBalance);
+      props.showMeta(true);
       props.showAlert("Wallet connected", "success");
+      props.showCurrentAccount(accounts[0]);
     }
   };
+
+  /**
+   * Setting isconnected false when matamask disconnected
+   */
   const onDisconnecting = () => {
     setisConnected(false);
   };
+
+  /**
+   * getting the current account connected
+   */
+  async function getAccount() {
+    const accounts = await (window as any).ethereum.enable();
+    const account = accounts[0];
+    const balance = await web3!.eth.getBalance(account);
+    let mainBalance = web3!.utils.fromWei(balance);
+    setcurrentAccount(account);
+    setcurrentBalance(mainBalance);
+    props.showcurrentBalance(mainBalance);
+    props.showAlert("changing accounts", "success");
+    props.showCurrentAccount(account);
+    props.showMeta(true);
+  }
+
+  (window as any).ethereum.on("accountsChanged", function (accounts: string[]) {
+    getAccount();
+  });
+
   useEffect(() => {
-    const handleAccountsChanged = async (accounts: string[]) => {
-      const web3Accounts = await web3!.eth.getAccounts();
-      if (accounts.length === 0) {
-        onLogout();
-      } else if (accounts[0] !== currentAccount) {
-        setcurrentAccount(accounts[0]);
-      }
-    };
-    const handleChainChanged = async (chainId: string) => {
+    /**
+     * handles chain changing of metamask. Switches network if connected to wrong chain
+     */
+    const handleChainChanged = async () => {
       const web3ChainId = await web3!.eth.getChainId();
+      if (web3ChainId !== 80001) {
+        props.showAlert("Connected to wrong network", "warning");
+        switchNetwork(80001);
+      }
       setChainId(web3ChainId);
     };
     if (isConnected) {
-      provider.on("accountChanged", handleAccountsChanged);
       provider.on("chainChanged", handleChainChanged);
     }
     return () => {
       if (isConnected) {
-        provider.removeListener("accountChanged", handleAccountsChanged);
         provider.removeListener("chainChanged", handleChainChanged);
       }
     };
   }, [isConnected]);
+
+  /**
+   * handles states if user logs out from metamask.
+   */
   const onLogout = () => {
     setisConnected(false);
-    setcurrentAccount(null);
+    setcurrentAccount("none");
+    props.showcurrentBalance("0");
     props.showAlert("Wallet Disconnected", "warning");
+    props.showMeta(false);
   };
   return (
     <Navbar
@@ -94,11 +148,7 @@ const Topbar = (props: {
         <div>
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
-            <Nav
-              className="me-auto my-2 my-lg-0 d-flex"
-              style={{ maxHeight: "100px" }}
-              navbarScroll
-            >
+            <Nav className="me-auto my-2 my-lg-0 d-flex" navbarScroll>
               <Image
                 fluid
                 className="px-2"

@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "react-bootstrap/Image";
-import logoIcon from "../svgs/logo_icon.svg";
-import arrow from "../svgs/keyboard_arrow_right.svg";
+import logoIcon from "../../svgs/logo_icon.svg";
+import arrow from "../../svgs/keyboard_arrow_right.svg";
 /**
  * Pool line Component
  */

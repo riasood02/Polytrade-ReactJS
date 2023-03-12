@@ -1,6 +1,14 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import Web3 from "web3";
+import { detectProvider } from "../Utils/GetProvider";
+import { switchNetwork } from "../Utils/SwitchNetwork";
+
+/**
+ * Wallet Connect
+ * @param {object} props Component props
+ * @param {(provider: any) => void} props.onConnecting function to provide provider
+ * @param {() => void} props.onDisconnecting function to set state disconnected
+ */
 
 const ConnectWallet = (props: {
   onConnecting: (provider: any) => void;
@@ -8,9 +16,11 @@ const ConnectWallet = (props: {
 }) => {
   const [provider, setProvider] = useState((window as any).ethereum);
   const [isMetaMaskInstalled, setisMetaMaskInstalled] = useState(false);
+
   useEffect(() => {
     setProvider(detectProvider());
   }, []);
+
   useEffect(() => {
     if (provider) {
       if (provider !== (window as any).ethereum) {
@@ -21,39 +31,10 @@ const ConnectWallet = (props: {
       setisMetaMaskInstalled(true);
     }
   }, [provider]);
-  const detectProvider = () => {
-    let provider;
-    if ((window as any).ethereum) {
-      provider = (window as any).ethereum;
-    } else if ((window as any).web3) {
-      provider = (window as any).web3.currentProvider;
-    } else {
-      console.warn("No Ethereum browser detected! check out Metamask");
-    }
-    return provider;
-  };
-  const web3 = new Web3((window as any).ethereum);
-  const getNetworkId = async () => {
-    const currentChainId = await web3!.eth.net.getId();
-    return currentChainId;
-  };
-  const switchNetwork = async (chainId: number) => {
-    const currentChainId = await getNetworkId();
 
-    if (currentChainId !== chainId) {
-      try {
-        await (window as any).ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: Web3.utils.toHex(chainId) }],
-        });
-      } catch (switchError: any) {
-        // This error code indicates that the chain has not been added to MetaMask.
-        if (switchError.code === 4902) {
-          alert("add this chain id");
-        }
-      }
-    }
-  };
+  /**
+   * using provider to connect to metamask wallet
+   */
   const onConnectWallet = async () => {
     await provider.request({
       method: "eth_requestAccounts",
@@ -61,6 +42,7 @@ const ConnectWallet = (props: {
     switchNetwork(80001);
     props.onConnecting(provider);
   };
+
   return (
     <>
       {isMetaMaskInstalled && (

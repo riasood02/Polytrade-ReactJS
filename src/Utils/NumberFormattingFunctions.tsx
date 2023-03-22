@@ -1,10 +1,22 @@
+import { BigNumberish, ethers } from "ethers";
+
 export const AddCommas = (number: Number) => {
   const decimalNumber = Number(number).toFixed(2);
   const splitNumber = decimalNumber.split(".");
   const result = `${Number(splitNumber[0]).toLocaleString("en-US")}`;
   return result + " USDC";
 };
+export const addUSDC = (number: Number) => {
+  return number.toString() + " USDC";
+};
 
+export const addressShortener = (address: string) => {
+  return (
+    address.substring(0, 5) + "..." + address.substring(address.length - 4)
+  );
+};
+export const toDecimal = (value: BigNumberish, decimal: number) =>
+  Number(ethers.formatUnits(value, decimal));
 export const formatAsPercent = (num: number) => {
   return new Intl.NumberFormat("default", {
     style: "percent",
@@ -13,9 +25,10 @@ export const formatAsPercent = (num: number) => {
   }).format(num / 100);
 };
 
-export const addDollar = (number: Number) => {
-  const num = number.toString();
-  return "$" + num;
+export const addDollar = (number: number | undefined) => {
+  const decimalNumber = Number(number).toFixed(2);
+  const result = `${Number(decimalNumber).toLocaleString("en-US")}`;
+  return "$" + result;
 };
 
 export const convertMatictoUSDC = (balance: string | undefined) => {

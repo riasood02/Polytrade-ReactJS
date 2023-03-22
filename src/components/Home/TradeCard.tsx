@@ -17,22 +17,25 @@ const TradeCard = ({
   SecondText: string;
 }) => {
   return (
-    <Col md={6} className="p-4 bg-white rounded-4">
+    <Col md={6} className="p-4 bg-white rounded-5 ">
       <div className="d-flex align-items-start">
         <div className="flex-grow-1">
           <div className="d-flex align-items-start">
-            <h2>
+            <h1>
               <b>{FirstText}</b>
-            </h2>
+            </h1>
           </div>
 
           <div className="d-flex gap-1 align-items-center">
-            <p className="fs-6 mb-0 text-muted">{SecondText}</p>
+            <p className="fs-5 mb-0 text-muted">{SecondText}</p>
             <Image src={info} />
           </div>
         </div>
         <div className="d-flex align-items-center">
-          <Button className="button-light rounded-pill" variant="default">
+          <Button
+            className="button-light rounded-pill px-4 py-2"
+            variant="default"
+          >
             Claim
           </Button>
         </div>

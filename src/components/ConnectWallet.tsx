@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { detectProvider } from "../Utils/GetProvider";
 import { switchNetwork } from "../Utils/SwitchNetwork";
-
+import "../style.css";
 /**
  * Wallet Connect
  * @param {object} props Component props
@@ -47,16 +47,11 @@ const ConnectWallet = (props: {
     <>
       {isMetaMaskInstalled && (
         <Button
-          style={{
-            color: "rgb(10,11,32)",
-            backgroundColor: "rgb(244,248,251)",
-            fontWeight: "500",
-          }}
-          className="rounded-pill"
+          className="rounded-pill button-dark py-3 px-5 fs-4"
           onClick={onConnectWallet}
           variant="default"
         >
-          connect
+          Connect to Wallet
         </Button>
       )}
       {!isMetaMaskInstalled && (

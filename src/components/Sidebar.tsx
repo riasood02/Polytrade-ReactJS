@@ -60,23 +60,28 @@ const Sidebar = () => {
     },
   ];
   return (
-    <div className="p-1">
-      <div>
-        <Image src={logo} alt="logo"></Image>
-      </div>
-      <div>
-        <Image src={symbol} alt="symbol"></Image>
-      </div>
+    <div className="p-4">
+      <a href="/">
+        <div>
+          <Image src={logo} alt="logo"></Image>
+        </div>
+        <div>
+          <Image src={symbol} alt="symbol"></Image>
+        </div>
+      </a>
 
-      <Nav defaultActiveKey="/home" className="flex-column">
-        {links.map((link) => (
-          <Nav.Link eventKey={link.link} className="mt-1">
-            <Image src={link.image} alt={link.alt}></Image>
-            <br />
-            <Link to={link.link} className="link-style fs-6 text-muted">
-              {link.text}
+      <Nav defaultActiveKey="/home" className="flex-column gap-4">
+        {links.map((links) => (
+          <div className="mt-4" key={links.id}>
+            <Link
+              to={links.link}
+              className="link-style fs-5 text-muted fw-normal"
+            >
+              <Image src={links.image} alt={links.alt}></Image>
+              <br />
+              {links.text}
             </Link>
-          </Nav.Link>
+          </div>
         ))}
       </Nav>
     </div>

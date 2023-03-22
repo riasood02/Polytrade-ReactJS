@@ -24,13 +24,13 @@ const PoolCard = ({
         <Image className="mt-2 circle-icon" src={image}></Image>
       </div>
       <div className="d-flex align-items-start">
-        <h2 className="py-1 text-align-start text-break text-start">
+        <h1 className="py-1 text-align-start text-break text-start">
           <b>{FirstText}</b>
-        </h2>
+        </h1>
       </div>
 
       <div className="d-flex gap-1 align-items-start">
-        <p className="fs-6 mb-0 text-muted text-wrap">{SecondText}</p>
+        <p className="fs-5 mb-0 text-muted text-wrap fw-normal">{SecondText}</p>
         <Image src={info} />
       </div>
     </Col>

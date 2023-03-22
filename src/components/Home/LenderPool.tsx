@@ -13,19 +13,32 @@ import PoolCard from "./PoolCard";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import React, { useEffect, useState } from "react";
+import "../../style.css";
 import {
+  approveSpendingLimit,
   getCurrentPoolLiquidity,
+  getDepositFunction,
   getRewardBalance,
   getStableBalance,
+  getUSDCBalance,
+  sendUSDCtoLenderPool,
 } from "../../Utils/SmartContractFunction";
-import { convertMatictoUSDC } from "../../Utils/NumberFormattingFunctions";
+import {
+  addDollar,
+  addUSDC,
+  convertMatictoUSDC,
+  toDecimal,
+} from "../../Utils/NumberFormattingFunctions";
 
 /**
  * Lender Pool
  * @param {object} props Component props
  * @param {string | undefined} props.currentBalance current wallet balance
  */
-const LenderPool = (props: { currentBalance: string | undefined }) => {
+const LenderPool = (props: {
+  currentBalance: string | undefined;
+  currentAccount: string | null | undefined;
+}) => {
   const [isError, setisError] = useState<boolean>(false);
   const [errors, setErrors] = useState<any>({});
   const [amount, setAmount] = useState<number>(0);
@@ -33,44 +46,54 @@ const LenderPool = (props: { currentBalance: string | undefined }) => {
   const [rewardBalance, setRewardBalance] = useState<string>();
   const [PoolLiquidity, setPoolLiquidity] = useState<string>();
   const [show, setShow] = useState(false);
+  const [USDCbal, setUSDCbal] = useState<Number>(0);
+  const [isLend, setisLend] = useState<number>(0);
+  const [myDeposit, setmyDeposit] = useState<string>();
 
+  const callGetDeposit = async () => {
+    const result = await getDepositFunction(props.currentAccount);
+    const response = toDecimal(result, 6);
+    setmyDeposit(addDollar(response));
+  };
+  useEffect(() => {
+    callGetDeposit();
+  }, [props.currentAccount]);
+  const handleChange = (event: any) => {
+    if (event.target.checked) {
+      setisLend(1);
+    } else {
+      setisLend(0);
+    }
+  };
   const handleInputAmount = (event: any) => {
     setAmount(event.target.value);
-    setisError(false);
-    const balance = extractBalance();
-    console.log(balance);
-    if (!amount) {
+    if (event.target.value === " ") {
       setisError(true);
       setErrors({ ...errors, amount: "Cant be empty" });
-      console.log("Please enter a number");
-    }
-    if (amount < 10) {
+    } else if (event.target.value < Number(100)) {
       setisError(true);
       setErrors({ ...errors, amount: "must be greater than 100" });
-      console.log("less than 100");
-    }
-    if (Number(amount) > Number(balance)) {
+    } else if (event.target.value > Number(USDCbal)) {
       setisError(true);
       setErrors({ ...errors, amount: "must be lower than balance" });
-      console.log("more than balance");
-    }
-    if (!isError) {
+    } else {
+      setisError(false);
       setErrors({ ...errors, amount: null });
     }
   };
 
-  const extractBalance = () => {
-    const bal = convertMatictoUSDC(props.currentBalance);
-    const splitNumber = bal.split(" ");
-    return splitNumber[0];
-  };
-
-  const handleSubmit = (e: any) => {
-    if (!isError) {
+  const handleSubmit = async (e: any) => {
+    if (!isError && isLend === 1) {
       console.log("submitted", amount);
+      setErrors({ ...errors, checkbox: null });
+      await sendUSDCtoLenderPool(props.currentAccount, amount);
+    } else {
+      setErrors({ ...errors, checkbox: "Cant be empty" });
     }
   };
-
+  const func = async (e: any) => {
+    await approveSpendingLimit(props.currentAccount, amount);
+  };
   const handleClose = () => setShow(false);
 
   const handleShow = () => setShow(true);
@@ -88,61 +111,67 @@ const LenderPool = (props: { currentBalance: string | undefined }) => {
       const result = await getCurrentPoolLiquidity();
       setPoolLiquidity(result);
     };
+
     callLiquidityBalance();
     callStableBalance();
     callRewardBalance();
   }, []);
+  useEffect(() => {
+    const callgetUSDCBalance = async () => {
+      if (props.currentAccount !== undefined || null) {
+        var response = await getUSDCBalance(props.currentAccount);
+        setUSDCbal(response);
+      }
+    };
+    callgetUSDCBalance();
+  }, [props.currentAccount]);
 
   return (
     <Col sm={12} md={8} className="mt-3">
       <div className="d-flex justify-content-between">
         <ButtonGroup aria-label="Basic example">
           <Button
-            style={{
-              borderTopLeftRadius: "46px",
-              borderBottomLeftRadius: "46px",
-            }}
+            className="radio-group-button-left p-3"
             variant="dark outline light"
           >
             USDC
           </Button>
-          <Button variant="dark outline-light">USDT</Button>
+          <Button className="p-3" variant="dark outline-light">
+            USDT
+          </Button>
           <Button
-            style={{
-              borderTopRightRadius: "46px",
-              borderBottomRightRadius: "46px",
-            }}
+            className="radio-group-button-right p-3"
             variant="dark outline-light"
           >
             USDA
           </Button>
         </ButtonGroup>
-        <Button className="text-white bg-dark rounded-pill" variant="default">
+        <Button
+          className=" button-dark rounded-pill px-4 py-3 fs-4"
+          variant="default"
+        >
           Calculate Rewards
         </Button>
       </div>
 
-      <div className="my-3 bg-white mx-2 rounded-4">
+      <div className="my-5 bg-white mx-2 rounded-5 p-5">
         <div className="d-flex justify-content-between">
           <div className="d-flex flex-grow-1 mx-3 mt-2">
-            <Image src={usdc} />
+            <Image height={120} src={usdc} />
             <div className="mx-2 mt-3">
-              <h5 className="lh-sm">24% APR*</h5>
-              <p className="fs-6 text-muted lh-sm">Polygon</p>
+              <h1 className="lh-sm">
+                <b>24% APR*</b>
+              </h1>
+              <p className="fs-5 text-muted lh-sm">Polygon</p>
             </div>
           </div>
           <div className="d-flex m-4 gap-5 align-items-center">
-            <a href="#" style={{ textDecoration: "none", fontWeight: "500" }}>
-              View Contracts
+            <a href="#" className="link-style">
+              <h4>View Contracts</h4>
             </a>
             <Button
               onClick={handleShow}
-              style={{
-                backgroundColor: "rgb(118,140,250",
-                fontWeight: "700",
-                minWidth: "150px",
-              }}
-              className="text-white rounded-pill"
+              className="button-dark text-white rounded-pill fs-4 px-4 py-3"
               variant="default"
             >
               Lend Now
@@ -162,7 +191,7 @@ const LenderPool = (props: { currentBalance: string | undefined }) => {
                     <Form.Label>Wallet Balance:</Form.Label>
 
                     <Form.Text>
-                      <b>{convertMatictoUSDC(props.currentBalance)}</b>
+                      <b>{addUSDC(USDCbal)}</b>
                     </Form.Text>
                   </Form.Group>
                   <Form.Group className="mb-3" controlId="Amount">
@@ -179,11 +208,24 @@ const LenderPool = (props: { currentBalance: string | undefined }) => {
                       {errors.amount}
                     </Form.Control.Feedback>
                   </Form.Group>
-                  <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                  <Form.Group
+                    className="mb-3 d-flex"
+                    controlId="formBasicCheckbox"
+                  >
                     <Form.Check
                       type="checkbox"
-                      label="Accept Terms and Conditions"
+                      label="Accept&nbsp;"
+                      value={isLend}
+                      onChange={handleChange}
+                      required
+                      isInvalid={!!errors.checkbox}
                     />
+                    <a className="text-dark" href="#">
+                      Terms and Conditions
+                    </a>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.checkbox}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Form>
               </Modal.Body>
@@ -191,11 +233,14 @@ const LenderPool = (props: { currentBalance: string | undefined }) => {
                 <Button variant="primary" onClick={handleSubmit}>
                   Lend
                 </Button>
+                <Button variant="primary" onClick={func}>
+                  Approve Spending Limit
+                </Button>
               </Modal.Footer>
             </Modal>
           </div>
         </div>
-        <Container className="py-2">
+        <Container className="py-2 mt-4">
           <Row className="gy-3 gx-3 mx-1">
             <div className="d-md-flex gap-3 justify-content-evenly">
               <PoolCard
@@ -227,7 +272,7 @@ const LenderPool = (props: { currentBalance: string | undefined }) => {
               />
               <PoolCard
                 image={tstable}
-                FirstText="3,75,481"
+                FirstText={myDeposit}
                 SecondText="T-Stable Balance"
               />
             </div>

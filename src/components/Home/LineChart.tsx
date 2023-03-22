@@ -24,7 +24,7 @@ ChartJS.register(
 /**
  * Create Line Chart with the data fetched from API
  */
-const LineChart = () => {
+const LineChart = (props: { showtotalInvoice: (invoice: number) => void }) => {
   const [LineData, setLineData] = useState<{ [key: string]: any }>({
     data: {
       labels: [],
@@ -86,6 +86,7 @@ const LineChart = () => {
           chartValues.set(apiData[i].disbursedDate, invoice_amount);
         }
       }
+      props.showtotalInvoice(totalInv);
       apiData.sort(sortbyDate);
 
       chartValues.forEach((values, keys) => {

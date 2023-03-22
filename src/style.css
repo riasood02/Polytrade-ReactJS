@@ -14,9 +14,13 @@
     font-weight: 500;
 
 }
-.radio-group-button {
+.radio-group-button-left {
     border-top-left-radius: 46px;
     border-bottom-left-radius: 46px;
+}
+.radio-group-button-right {
+    border-top-right-radius: 46px;
+    border-bottom-right-radius: 46px;
 }
 .link-style {
     text-decoration: none;
@@ -26,6 +30,7 @@
     background-color: rgb(118,140,250);
     font-weight: 700;
     min-width: 150px;
+    color: white;
 }
 .circle-icon {
     background: linear-gradient(
@@ -34,6 +39,6 @@
       #a2a5f4 52.25%,
       #98b8ef 105.13%
     );
-    padding: 10px;
+    padding: 30px;
     border-radius: 45px;
   }

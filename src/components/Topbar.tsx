@@ -12,6 +12,7 @@ import { Button, ButtonGroup, Dropdown } from "react-bootstrap";
 import meta from "../svgs/metamask.svg";
 import Web3 from "web3";
 import { switchNetwork } from "../Utils/SwitchNetwork";
+import { addressShortener } from "../Utils/NumberFormattingFunctions";
 
 /**
  * Top Navigation Bar
@@ -131,7 +132,7 @@ const Topbar = (props: {
   };
   return (
     <Navbar
-      className="d-flex justify-content-between p-3"
+      className="d-flex justify-content-between align-items-center py-5"
       bg="white"
       expand="lg"
     >
@@ -142,20 +143,43 @@ const Topbar = (props: {
               className="fas fa-align-left primary-text fs-4 me-auto my-2 my-lg-0 "
               id="menu-toggle"
             ></i>
-            <h2 className="fs-2 m-0">Dashboard</h2>
+            <h1>Dashboard</h1>
           </Navbar.Brand>
         </div>
         <div>
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
-            <Nav className="me-auto my-2 my-lg-0 d-flex" navbarScroll>
-              <Image
-                fluid
-                className="px-2"
-                src={notification}
-                alt="notification"
-              ></Image>
-              <Image fluid className="px-2" src={audited} alt="audited"></Image>
+            <Nav
+              className="me-auto my-2 my-lg-0 d-flex gap-4 align-items-center"
+              navbarScroll
+            >
+              <Dropdown>
+                <Dropdown.Toggle
+                  variant="default"
+                  className="text-muted fw-normal fs-3 border-0"
+                  id="dropdown-basic"
+                >
+                  Audited by
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu className="rounded-4 w-100">
+                  <Dropdown.Item href="#/action-1">
+                    {" "}
+                    <Image
+                      fluid
+                      className="px-2"
+                      src={audited}
+                      alt="audited"
+                    ></Image>
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+              {isConnected && (
+                <a href="">
+                  <Image fluid src={notification} alt="notification"></Image>
+                </a>
+              )}
+
               {!isConnected && (
                 <ConnectWallet
                   onConnecting={onConnecting}
@@ -164,48 +188,43 @@ const Topbar = (props: {
               )}
               {isConnected && (
                 <Dropdown
-                  as={ButtonGroup}
+                  className="rounded-pill"
                   style={{
                     color: "rgb(10,11,32)",
                     backgroundColor: "rgb(244,248,251)",
                     fontWeight: "500",
                     alignItems: "center",
                   }}
-                  className="rounded-pill"
                 >
-                  <Image
-                    className="px-2"
-                    style={{ height: "20px" }}
-                    src={meta}
-                  />
-                  <Button variant="default">
-                    <>{currentAccount}</>
-                  </Button>
+                  <div className="d-flex align-items-center py-3 px-5">
+                    <p className="mb-0 mx-2 fs-3">Account</p>
+                    <Image
+                      className="mx-1"
+                      style={{ height: "20px" }}
+                      src={meta}
+                    />
+                    <div className="text-muted fs-4">
+                      <>{addressShortener(currentAccount)}</>
+                    </div>
+                    <div>
+                      <Dropdown.Toggle
+                        variant="default"
+                        id="dropdown-basic"
+                        className="border-0"
+                      ></Dropdown.Toggle>
+                    </div>
+                  </div>
 
-                  <Dropdown.Toggle
-                    split
-                    variant="default"
-                    id="dropdown-split-basic"
-                  />
-
-                  <Dropdown.Menu className="rounded-pill">
-                    <Dropdown.Item onClick={onLogout}>Disconnect</Dropdown.Item>
+                  <Dropdown.Menu className="rounded-4 w-100">
+                    <Dropdown.Item onClick={onLogout}>
+                      <h3 className="text-bold">Disconnect</h3>
+                    </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
               )}
-              <Image className="px-2" rounded src={profile}></Image>
-              <NavDropdown
-                title="messilionel@gmail.com"
-                id="navbarScrollingDropdown"
-              >
-                <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-                <NavDropdown.Item href="#action4">
-                  Another action
-                </NavDropdown.Item>
-                <NavDropdown.Item href="#action5">
-                  Something else here
-                </NavDropdown.Item>
-              </NavDropdown>
+              {isConnected && (
+                <Image className="px-2" rounded src={profile}></Image>
+              )}
             </Nav>
           </Navbar.Collapse>
         </div>

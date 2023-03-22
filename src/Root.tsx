@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row } from "react-bootstrap";
 import LenderPool from "./components/Home/LenderPool";
 import Pool from "./components/Home/Pool";
@@ -35,7 +35,6 @@ const Root = () => {
       setAlert({ message: null, type: null });
     }, 3000);
   };
-
   return (
     <div className="app d-flex">
       <Sidebar />
@@ -55,7 +54,10 @@ const Root = () => {
           <Pool />
           <Container fluid>
             <Row>
-              <LenderPool currentBalance={currentBalance} />
+              <LenderPool
+                currentBalance={currentBalance}
+                currentAccount={currentAccount}
+              />
               <OverviewPool
                 meta={metamaskConnected}
                 currentAccount={currentAccount}

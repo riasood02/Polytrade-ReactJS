@@ -3,6 +3,7 @@ import { Button } from "react-bootstrap";
 import { detectProvider } from "../Utils/GetProvider";
 import { switchNetwork } from "../Utils/SwitchNetwork";
 import "../style.css";
+import PrimaryButton from "../atoms/PrimaryButton";
 /**
  * Wallet Connect
  * @param {object} props Component props
@@ -46,13 +47,7 @@ const ConnectWallet = (props: {
   return (
     <>
       {isMetaMaskInstalled && (
-        <Button
-          className="rounded-pill button-dark py-3 px-5 fs-4"
-          onClick={onConnectWallet}
-          variant="default"
-        >
-          Connect to Wallet
-        </Button>
+        <PrimaryButton btnName="Connect to Wallet" onClick={onConnectWallet} />
       )}
       {!isMetaMaskInstalled && (
         <p>

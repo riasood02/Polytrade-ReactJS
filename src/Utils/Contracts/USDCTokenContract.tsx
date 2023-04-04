@@ -1,5 +1,8 @@
+import { ethers } from "ethers";
 import Web3 from "web3";
 import { Contract } from "web3-eth-contract";
+import { detectProvider } from "../GetProvider";
+
 let USDCDetails;
 USDCDetails = {
   contractAddress: "0xbEc686095Cfad43B741FA0ED305200100986CEf1",
@@ -170,7 +173,12 @@ USDCDetails = {
     },
   ],
 };
-
+const provider = new ethers.providers.Web3Provider((window as any).ethereum);
+const bleh = new ethers.Contract(
+  USDCDetails.contractAddress,
+  USDCDetails.abi,
+  provider.getSigner()
+);
 var web3 = new Web3((window as any).ethereum);
 
 var USDCContract: Contract = new web3.eth.Contract(
@@ -178,4 +186,4 @@ var USDCContract: Contract = new web3.eth.Contract(
   USDCDetails.contractAddress
 );
 
-export default USDCContract;
+export { USDCContract, bleh };

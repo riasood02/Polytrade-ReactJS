@@ -1,4 +1,5 @@
 import { BigNumberish, ethers } from "ethers";
+import { formatUnits } from "ethers/lib/utils";
 
 export const AddCommas = (number: Number) => {
   const decimalNumber = Number(number).toFixed(2);
@@ -16,7 +17,7 @@ export const addressShortener = (address: string) => {
   );
 };
 export const toDecimal = (value: BigNumberish, decimal: number) =>
-  Number(ethers.formatUnits(value, decimal));
+  Number(formatUnits(value, decimal));
 export const formatAsPercent = (num: number) => {
   return new Intl.NumberFormat("default", {
     style: "percent",

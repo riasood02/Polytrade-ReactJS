@@ -7,7 +7,14 @@ import tstable from "../../svgs/T-Stable.svg";
 import usdc from "../../svgs/usdc.svg";
 import info from "../../svgs/info.svg";
 import Image from "react-bootstrap/Image";
-import { Button, ButtonGroup, Col, Container, Row } from "react-bootstrap";
+import {
+  Button,
+  ButtonGroup,
+  Col,
+  Container,
+  Row,
+  Spinner,
+} from "react-bootstrap";
 import RewardsPool from "./RewardsPool";
 import PoolCard from "./PoolCard";
 import Form from "react-bootstrap/Form";
@@ -26,9 +33,10 @@ import {
 import {
   addDollar,
   addUSDC,
-  convertMatictoUSDC,
   toDecimal,
 } from "../../Utils/NumberFormattingFunctions";
+import { bleh } from "../../Utils/Contracts/USDCTokenContract";
+import PrimaryButton from "../../atoms/PrimaryButton";
 
 /**
  * Lender Pool
@@ -38,7 +46,11 @@ import {
 const LenderPool = (props: {
   currentBalance: string | undefined;
   currentAccount: string | null | undefined;
+  notify: (message: string, type: any) => void;
 }) => {
+  const [spin, setspin] = useState<boolean>(false);
+  const [isDisableLend, setisDisableLend] = useState<boolean>(true);
+  const [isDisableApprove, setisDisableApprove] = useState<boolean>(false);
   const [isError, setisError] = useState<boolean>(false);
   const [errors, setErrors] = useState<any>({});
   const [amount, setAmount] = useState<number>(0);
@@ -49,6 +61,8 @@ const LenderPool = (props: {
   const [USDCbal, setUSDCbal] = useState<Number>(0);
   const [isLend, setisLend] = useState<number>(0);
   const [myDeposit, setmyDeposit] = useState<string>();
+  const [approvaltxn, setapprovaltxn] = useState<boolean>();
+  const [approvalAmount, setapprovalAmount] = useState<number>(0);
 
   const callGetDeposit = async () => {
     const result = await getDepositFunction(props.currentAccount);
@@ -87,17 +101,40 @@ const LenderPool = (props: {
       console.log("submitted", amount);
       setErrors({ ...errors, checkbox: null });
       await sendUSDCtoLenderPool(props.currentAccount, amount);
+      props.notify("Deposit transaction submitted", "info");
     } else {
       setErrors({ ...errors, checkbox: "Cant be empty" });
     }
   };
   const func = async (e: any) => {
     await approveSpendingLimit(props.currentAccount, amount);
+    setspin(true);
   };
   const handleClose = () => setShow(false);
 
   const handleShow = () => setShow(true);
 
+  useEffect(() => {
+    bleh.on("Approval", (owner: any, spender: any, value: number) => {
+      let ApprovalEvent = {
+        from: owner,
+        to: spender,
+        value: value,
+      };
+      if (
+        ApprovalEvent.from === props.currentAccount &&
+        ApprovalEvent.to === "0x5AaA4e76cEbAbf2119fD88d86ec423ab01196d5A" &&
+        toDecimal(ApprovalEvent.value, 0) === Number(amount)
+      ) {
+        setapprovalAmount(toDecimal(ApprovalEvent.value, 0));
+        setisDisableLend(false);
+        setisDisableApprove(true);
+        props.notify("approve transaction submitted", "info");
+        setspin(false);
+        //console.log(ApprovalEvent);
+      }
+    });
+  }, [approvaltxn, amount, props.currentAccount]);
   useEffect(() => {
     const callStableBalance = async () => {
       const result = await getStableBalance();
@@ -146,12 +183,7 @@ const LenderPool = (props: {
             USDA
           </Button>
         </ButtonGroup>
-        <Button
-          className=" button-dark rounded-pill px-4 py-3 fs-4"
-          variant="default"
-        >
-          Calculate Rewards
-        </Button>
+        <PrimaryButton btnName="Calculate Rewards" />
       </div>
 
       <div className="my-5 bg-white mx-2 rounded-5 p-5">
@@ -169,13 +201,8 @@ const LenderPool = (props: {
             <a href="#" className="link-style">
               <h4>View Contracts</h4>
             </a>
-            <Button
-              onClick={handleShow}
-              className="button-dark text-white rounded-pill fs-4 px-4 py-3"
-              variant="default"
-            >
-              Lend Now
-            </Button>
+            <PrimaryButton btnName="Lend Now" onClick={handleShow} />
+
             <Modal show={show} onHide={handleClose}>
               <Modal.Header closeButton>
                 <Modal.Title>
@@ -230,10 +257,28 @@ const LenderPool = (props: {
                 </Form>
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="primary" onClick={handleSubmit}>
+                <Button
+                  variant="primary"
+                  disabled={isDisableLend}
+                  onClick={handleSubmit}
+                >
                   Lend
                 </Button>
-                <Button variant="primary" onClick={func}>
+                <Button
+                  variant="primary"
+                  onClick={func}
+                  disabled={isDisableApprove}
+                >
+                  {spin && (
+                    <Spinner
+                      as="span"
+                      variant="light"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                      animation="border"
+                    />
+                  )}
                   Approve Spending Limit
                 </Button>
               </Modal.Footer>

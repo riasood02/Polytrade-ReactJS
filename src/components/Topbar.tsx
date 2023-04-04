@@ -20,8 +20,7 @@ import { addressShortener } from "../Utils/NumberFormattingFunctions";
  * @param {(address: string | null | undefined) => void} props.showCurrentAccount current wallet address
  * @param {boolean} props.meta is metamask connected
  * @param {(b: boolean) => void} props.showMeta function to set props.meta
- * @param {{ message: string | null; type: string | null;}} props.showAlert alert with message and its type
- * @param {(message: string | null, type: string | null) => void} props.showAlert function to set alert
+ * @param {(message: string, type: any) => void} props.showAlert function to set alert
  * @param {(bal: string | undefined) => void} props.showcurrentBalance displays current wallet balance
  */
 
@@ -29,12 +28,8 @@ const Topbar = (props: {
   showCurrentAccount: (address: string | null | undefined) => void;
   meta: boolean;
   showMeta: (b: boolean) => void;
-  alert: {
-    message: string | null;
-    type: string | null;
-  };
-  showAlert: (message: string | null, type: string | null) => void;
   showcurrentBalance: (bal: string | undefined) => void;
+  notify: (type: any, message: string) => void;
 }) => {
   const [isConnected, setisConnected] = useState(false);
   const [currentAccount, setcurrentAccount] = useState<string>("none");
@@ -55,8 +50,7 @@ const Topbar = (props: {
     const balance = await web3!.eth.getBalance(accounts[0]);
     let mainBalance = web3!.utils.fromWei(balance);
     if (accounts.length === 0) {
-      console.log("please connect to metamask");
-      props.showAlert("Metamask not connected", "danger");
+      props.notify("Metamask not connected", "warn");
     } else if (accounts[0] !== currentAccount) {
       setProvider(provider);
       setWeb3(web3);
@@ -66,7 +60,7 @@ const Topbar = (props: {
       setcurrentBalance(mainBalance);
       props.showcurrentBalance(mainBalance);
       props.showMeta(true);
-      props.showAlert("Wallet connected", "success");
+      props.notify("Wallet Connected", "success");
       props.showCurrentAccount(accounts[0]);
     }
   };
@@ -89,9 +83,9 @@ const Topbar = (props: {
     setcurrentAccount(account);
     setcurrentBalance(mainBalance);
     props.showcurrentBalance(mainBalance);
-    props.showAlert("changing accounts", "success");
     props.showCurrentAccount(account);
     props.showMeta(true);
+    props.notify("Metamask Wallet Account changed", "info");
   }
 
   (window as any).ethereum.on("accountsChanged", function (accounts: string[]) {
@@ -105,7 +99,7 @@ const Topbar = (props: {
     const handleChainChanged = async () => {
       const web3ChainId = await web3!.eth.getChainId();
       if (web3ChainId !== 80001) {
-        props.showAlert("Connected to wrong network", "warning");
+        props.notify("Connected to wrong network", "warn");
         switchNetwork(80001);
       }
       setChainId(web3ChainId);
@@ -127,7 +121,7 @@ const Topbar = (props: {
     setisConnected(false);
     setcurrentAccount("none");
     props.showcurrentBalance("0");
-    props.showAlert("Wallet Disconnected", "warning");
+    props.notify("Wallet Disconnected", "info");
     props.showMeta(false);
   };
   return (

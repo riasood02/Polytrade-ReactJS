@@ -5,7 +5,8 @@ import Pool from "./components/Home/Pool";
 import OverviewPool from "./components/Home/OverviewPool";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
-import Alert from "./components/Alert";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Root = () => {
   const [alert, setAlert] = useState<{
@@ -35,6 +36,58 @@ const Root = () => {
       setAlert({ message: null, type: null });
     }, 3000);
   };
+  const notify = (message: string, type?: any) => {
+    if (type === "success")
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: false,
+        progress: undefined,
+        theme: "light",
+      });
+    else if (type === "info")
+      toast.info(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: false,
+        progress: undefined,
+        theme: "light",
+      });
+    else if (type === "warn")
+      toast.warn(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: false,
+        progress: undefined,
+        theme: "light",
+      });
+    else if (type === "error")
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: false,
+        progress: undefined,
+        theme: "light",
+      });
+    else
+      toast(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: false,
+        progress: undefined,
+        theme: "light",
+      });
+  };
   return (
     <div className="app d-flex">
       <Sidebar />
@@ -43,20 +96,28 @@ const Root = () => {
           showCurrentAccount={showCurrentAccount}
           meta={metamaskConnected}
           showMeta={showmetamaskConnected}
-          alert={alert}
-          showAlert={showAlert}
           showcurrentBalance={showcurrentBalance}
+          notify={notify}
+        />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable={false}
+          pauseOnHover
+          theme="light"
         />
         <div className="main-body container-true p-4">
-          {alert.message !== null && (
-            <Alert alert={alert} showAlert={showAlert} />
-          )}
           <Pool />
           <Container fluid>
             <Row>
               <LenderPool
                 currentBalance={currentBalance}
                 currentAccount={currentAccount}
+                notify={notify}
               />
               <OverviewPool
                 meta={metamaskConnected}

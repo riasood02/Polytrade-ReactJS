@@ -1,7 +1,7 @@
 import StableContract from "./Contracts/StableContract";
 import RewardContract from "./Contracts/RewardContract";
 import PoolLiquidityContract from "./Contracts/PoolLiquidityContract";
-import { BigNumberish, ethers, formatUnits } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 import {
   AddCommas,
   addDollar,
@@ -9,11 +9,12 @@ import {
 } from "./NumberFormattingFunctions";
 import KYCContract from "./Contracts/KYCVerificationContract";
 import GetDepositContract from "./Contracts/GetDepositContract";
-import LenderPoolContract from "./Contracts/LenderPoolContract";
-import USDCContract from "./Contracts/USDCTokenContract";
+import { LenderPoolContract, blehLender } from "./Contracts/LenderPoolContract";
+import { USDCContract, bleh } from "./Contracts/USDCTokenContract";
+import { formatUnits } from "ethers/lib/utils";
 
 const toDecimal = (value: BigNumberish, decimal: number) =>
-  Number(ethers.formatUnits(value, decimal));
+  Number(formatUnits(value, decimal));
 
 export const getStableBalance = async () => {
   let response = await StableContract.methods.getReward().call();
@@ -40,6 +41,12 @@ export const getKYCValidation = async (address: string | null | undefined) => {
   let response = await KYCContract.methods.isValid(address).call();
   return response;
 };
+export const getKYCProviderInfo = async (
+  address: string | null | undefined
+) => {
+  let response = await KYCContract.methods.getUserProvider(address).call();
+  return response.toString();
+};
 
 export const getDepositFunction = async (
   address: string | null | undefined
@@ -51,29 +58,37 @@ export const approveSpendingLimit = async (
   address: string | null | undefined,
   amount: number
 ) => {
-  let approval = await USDCContract.methods
-    .approve("0x5AaA4e76cEbAbf2119fD88d86ec423ab01196d5A", amount)
-    .send({ from: address });
+  let approval = await bleh.approve(
+    "0x5AaA4e76cEbAbf2119fD88d86ec423ab01196d5A",
+    amount
+  );
   // console.log(approval);
-  console.log(approval.events);
+  //console.log(approval.events);
 };
 export const sendUSDCtoLenderPool = async (
   address: string | null | undefined,
   amount: number
 ) => {
-  let response = await LenderPoolContract.methods
-    .deposit(amount)
-    .send({ from: address });
+  let response = await blehLender.deposit(amount);
   // console.log(response);
-  checkEvents();
+  blehLender.on("Deposit", (from: any, to: any, value: number, event: any) => {
+    let transferEvent = {
+      from: from,
+      to: to,
+      value: value,
+      eventData: event,
+    };
+
+    console.log(JSON.stringify(transferEvent, null, 4));
+  });
 };
 export const checkEvents = () => {
-  let options = {
-    fromBlock: 0,
-  };
+  // let options = {
+  //   fromBlock: 0,
+  // };
 
   USDCContract.events
-    .Transfer(options)
+    .Approval()
     .on("data", (event: any) => console.log("event", event))
     .on("changed", (changed: any) => console.log("changed", changed))
     .on("error", (err: any) => console.log("err", err))

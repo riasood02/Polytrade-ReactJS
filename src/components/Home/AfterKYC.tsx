@@ -4,12 +4,13 @@ import Image from "react-bootstrap/Image";
 import { Button, Col } from "react-bootstrap";
 import {
   getDepositFunction,
+  getKYCProviderInfo,
   getKYCValidation,
   validationLimit,
 } from "../../Utils/SmartContractFunction";
 import { addDollar, toDecimal } from "../../Utils/NumberFormattingFunctions";
 import "../../style.css";
-
+import { KYCProvider } from "../../Data/KYCProviders";
 /**
  * AfterKYC Status
  * @param {object} props Component props
@@ -24,6 +25,10 @@ const AfterKYC = (props: {
   const [KYCVerified, setKYCVerified] = useState<boolean>();
   const [myDeposit, setmyDeposit] = useState<string>();
   const [validateLimit, setvalidateLimit] = useState<string>();
+  const [KYCInfo, setKYCInfo] = useState<{ name: string; icon: string }>({
+    name: "",
+    icon: "",
+  });
   /**
    * get My Deposits by calling function from smart contract
    */
@@ -35,6 +40,15 @@ const AfterKYC = (props: {
     const result = await getDepositFunction(props.currentAccount);
     const response = toDecimal(result, 6);
     setmyDeposit(addDollar(response));
+  };
+  const callGetKYCUserProvider = async () => {
+    const result = await getKYCProviderInfo(props.currentAccount);
+    for (let i = 0; i < KYCProvider.length; i++) {
+      if (KYCProvider[i].id === result) {
+        setKYCInfo({ name: KYCProvider[i].name, icon: KYCProvider[i].icon });
+        break;
+      }
+    }
   };
 
   /**
@@ -50,6 +64,7 @@ const AfterKYC = (props: {
   useEffect(() => {
     callKYCVerification();
     callGetDeposit();
+    callGetKYCUserProvider();
   }, [props.currentAccount]);
   useEffect(() => {
     callValidationLimit();
@@ -81,9 +96,12 @@ const AfterKYC = (props: {
           {KYCVerified && (
             <div>
               <p className="fs-4 text-muted lh-sm">Provider</p>
-              <h3 className="d-flex align-items-start lh-sm">
-                <b>Synaps</b>
-              </h3>
+              <div className="d-flex align-items-center">
+                <Image src={KYCInfo.icon} height={70} />
+                <h3 className="d-flex align-items-start lh-sm">
+                  <b>{KYCInfo.name}</b>
+                </h3>
+              </div>
             </div>
           )}
         </div>

@@ -1,5 +1,7 @@
+import { ethers } from "ethers";
 import Web3 from "web3";
 import { Contract } from "web3-eth-contract";
+import { detectProvider } from "../GetProvider";
 let LenderPoolDetails;
 LenderPoolDetails = {
   contractAddress: "0x5AaA4e76cEbAbf2119fD88d86ec423ab01196d5A",
@@ -372,7 +374,12 @@ LenderPoolDetails = {
     },
   ],
 };
-
+const provider = new ethers.providers.Web3Provider((window as any).ethereum);
+const blehLender = new ethers.Contract(
+  LenderPoolDetails.contractAddress,
+  LenderPoolDetails.abi,
+  provider.getSigner()
+);
 var web3 = new Web3((window as any).ethereum);
 
 var LenderPoolContract: Contract = new web3.eth.Contract(
@@ -380,4 +387,4 @@ var LenderPoolContract: Contract = new web3.eth.Contract(
   LenderPoolDetails.contractAddress
 );
 
-export default LenderPoolContract;
+export { LenderPoolContract, blehLender };

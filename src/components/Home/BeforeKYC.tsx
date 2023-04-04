@@ -3,6 +3,7 @@ import { Button, Col } from "react-bootstrap";
 import Badge from "../svgs/Badge.svg";
 import Image from "react-bootstrap/Image";
 import "../../style.css";
+import PrimaryButton from "../../atoms/PrimaryButton";
 /**
  * BeforeKYC Status
  */
@@ -17,12 +18,7 @@ const BeforeKYC = () => {
           </h3>
         </div>
         <div>
-          <Button
-            className="button-dark text-white rounded-pill"
-            variant="default"
-          >
-            Start KYC
-          </Button>
+          <PrimaryButton btnName="Start KYC" />
         </div>
       </div>
       <div className="mt-2">

@@ -18,6 +18,7 @@ export const addressShortener = (address: string) => {
 };
 export const toDecimal = (value: BigNumberish, decimal: number) =>
   Number(formatUnits(value, decimal));
+
 export const formatAsPercent = (num: number) => {
   return new Intl.NumberFormat("default", {
     style: "percent",

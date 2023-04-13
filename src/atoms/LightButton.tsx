@@ -1,11 +1,11 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 
-const PrimaryButton = (props: { btnName: string; onClick?: () => void }) => {
+const LightButton = (props: { btnName: string; onClick?: () => void }) => {
   return (
     <Button
       onClick={props.onClick}
-      className=" button-dark rounded-pill px-5 py-3 fs-4"
+      className="button-light rounded-pill px-4 py-2"
       variant="default"
     >
       {props.btnName}
@@ -13,4 +13,4 @@ const PrimaryButton = (props: { btnName: string; onClick?: () => void }) => {
   );
 };
 
-export default PrimaryButton;
+export default LightButton;

@@ -1,42 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import Pool from "./Pool";
 import { Container, Row } from "react-bootstrap";
-import LenderPool from "./components/home/LenderPool";
-import Pool from "./components/home/Pool";
-import OverviewPool from "./components/home/OverviewPool";
-import Sidebar from "./components/Sidebar";
-import Topbar from "./components/Topbar";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import RedeemPool from "./components/WorldOfTspice/RedeemPool";
-import PoolHistory from "./components/history/PoolHistory";
+import LenderPool from "./LenderPool";
+import OverviewPool from "./OverviewPool";
+import RedeemPool from "../WorldOfTspice/RedeemPool";
+import PoolHistory from "../history/PoolHistory";
+import { toast, ToastContainer } from "react-toastify";
 
-const Root = () => {
-  const [alert, setAlert] = useState<{
-    message: string | null;
-    type: string | null;
-  }>({ message: null, type: null });
+const Home = () => {
   const [currentAccount, setcurrentAccount] = useState<
     string | null | undefined
   >();
   const showCurrentAccount = (address: string | null | undefined) => {
     setcurrentAccount(address);
   };
-  const [currentBalance, setcurrentBalance] = useState<string>();
-  const showcurrentBalance = (bal: string | undefined) => {
-    setcurrentBalance(bal);
-  };
   const [metamaskConnected, setmetamaskConnected] = useState<boolean>(false);
   const showmetamaskConnected = (b: boolean) => {
     setmetamaskConnected(b);
-  };
-  const showAlert = (message: string | null, type: string | null) => {
-    setAlert({
-      message: message,
-      type: type,
-    });
-    setTimeout(() => {
-      setAlert({ message: null, type: null });
-    }, 3000);
   };
   const notify = (message: string, type?: any) => {
     if (type === "success")
@@ -91,30 +71,30 @@ const Root = () => {
       });
   };
   return (
-    <div className="app d-flex">
-      <Sidebar />
-      <div className="flex-grow-1">
-        <Topbar
-          showCurrentAccount={showCurrentAccount}
-          meta={metamaskConnected}
-          showMeta={showmetamaskConnected}
-          showcurrentBalance={showcurrentBalance}
-          notify={notify}
-        />
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable={false}
-          pauseOnHover
-          theme="light"
-        />
-      </div>
+    <div className="main-body container-true p-4">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable={false}
+        pauseOnHover
+        theme="light"
+      />
+      <Pool />
+      <Container fluid>
+        <Row>
+          <LenderPool currentAccount={currentAccount} notify={notify} />
+          <OverviewPool
+            meta={metamaskConnected}
+            currentAccount={currentAccount}
+          />
+        </Row>
+      </Container>
     </div>
   );
 };
 
-export default Root;
+export default Home;

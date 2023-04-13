@@ -3,6 +3,7 @@ import { Button, Col } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
 import info from "../../svgs/info.svg";
 import "../../style.css";
+import LightButton from "../../atoms/LightButton";
 /**
  * Trade Card
  * @param {object} props Component props
@@ -32,12 +33,7 @@ const TradeCard = ({
           </div>
         </div>
         <div className="d-flex align-items-center">
-          <Button
-            className="button-light rounded-pill px-4 py-2"
-            variant="default"
-          >
-            Claim
-          </Button>
+          <LightButton btnName="Claim" />
         </div>
       </div>
     </Col>

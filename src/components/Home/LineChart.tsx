@@ -69,7 +69,7 @@ const LineChart = (props: { showtotalInvoice: (invoice: number) => void }) => {
         );
       };
       const len: Number = apiData.length;
-      for (var i = 0; i < len; i++) {
+      for (var i = 0; i < apiData.length; i++) {
         const d = new Date(apiData[i].disbursedDate);
         const dt =
           d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();

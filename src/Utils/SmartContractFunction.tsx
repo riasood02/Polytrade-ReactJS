@@ -12,6 +12,11 @@ import GetDepositContract from "./Contracts/GetDepositContract";
 import { LenderPoolContract, blehLender } from "./Contracts/LenderPoolContract";
 import { USDCContract, bleh } from "./Contracts/USDCTokenContract";
 import { formatUnits } from "ethers/lib/utils";
+import { TUSDCContract, TUSDCEthers } from "./Contracts/TUSDCContract";
+import {
+  RedeemPoolContract,
+  RedeemPoolEthers,
+} from "./Contracts/RedeemPoolContract";
 
 const toDecimal = (value: BigNumberish, decimal: number) =>
   Number(formatUnits(value, decimal));
@@ -62,8 +67,6 @@ export const approveSpendingLimit = async (
     "0x5AaA4e76cEbAbf2119fD88d86ec423ab01196d5A",
     amount
   );
-  // console.log(approval);
-  //console.log(approval.events);
 };
 export const sendUSDCtoLenderPool = async (
   address: string | null | undefined,
@@ -71,29 +74,8 @@ export const sendUSDCtoLenderPool = async (
 ) => {
   let response = await blehLender.deposit(amount);
   // console.log(response);
-  blehLender.on("Deposit", (from: any, to: any, value: number, event: any) => {
-    let transferEvent = {
-      from: from,
-      to: to,
-      value: value,
-      eventData: event,
-    };
-
-    console.log(JSON.stringify(transferEvent, null, 4));
-  });
 };
-export const checkEvents = () => {
-  // let options = {
-  //   fromBlock: 0,
-  // };
 
-  USDCContract.events
-    .Approval()
-    .on("data", (event: any) => console.log("event", event))
-    .on("changed", (changed: any) => console.log("changed", changed))
-    .on("error", (err: any) => console.log("err", err))
-    .on("connected", (str: any) => console.log("str", str));
-};
 export const getUSDCBalance = async (address: string | null | undefined) => {
   let response = await USDCContract.methods.balanceOf(address).call();
   const USDCBalance = toDecimal(response, 6);
@@ -105,3 +87,43 @@ export const validationLimit = async () => {
   const validateLimit = toDecimal(response, 6);
   return "$ " + validateLimit.toString();
 };
+
+export const redeemTSpiceBalance = async (amount: number) => {
+  let response = await blehLender.withdrawDeposit(amount);
+};
+
+export const getTUSDCBalance = async (address: string | null | undefined) => {
+  let response = await TUSDCContract.methods.balanceOf(address).call();
+  const USDCBalance = toDecimal(response, 6);
+  return USDCBalance;
+};
+export const claimUSDC = async (amount: number) => {
+  let response = await RedeemPoolEthers.redeemStable(amount * 1000000);
+  console.log(response);
+};
+export const approveTspiceSpendingLimit = async (
+  address: string | null | undefined,
+  amount: number
+) => {
+  let approval = await TUSDCEthers.approve(
+    "0xA72AfE1Ac88fB999AeF61FBB866F8C4Ad6B25dDb",
+    amount * 1000000
+  );
+};
+// export const redeemTspiceMetamask = async (coin, amount) => {
+//   try {
+//     const contract = WALLET_HELPERS.getSignerContract(
+//       coin.LENDER_POOL.ADDRESS,
+//       coin.LENDER_POOL.ABI,
+//     );
+
+//     const redeemResult = await contract.withdrawDeposit(amount);
+//     return redeemResult.hash;
+//   } catch (error) {
+//     if (error.code === WALLET.CANCEL_CODE) {
+//       return { code: WALLET.CANCEL_CODE };
+//     }
+
+//     return '';
+//   }
+// };

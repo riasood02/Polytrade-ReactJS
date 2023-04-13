@@ -36,11 +36,13 @@ const AfterKYC = (props: {
     const result = await validationLimit();
     setvalidateLimit(result);
   };
+
   const callGetDeposit = async () => {
     const result = await getDepositFunction(props.currentAccount);
     const response = toDecimal(result, 6);
     setmyDeposit(addDollar(response));
   };
+
   const callGetKYCUserProvider = async () => {
     const result = await getKYCProviderInfo(props.currentAccount);
     for (let i = 0; i < KYCProvider.length; i++) {
@@ -66,6 +68,7 @@ const AfterKYC = (props: {
     callGetDeposit();
     callGetKYCUserProvider();
   }, [props.currentAccount]);
+
   useEffect(() => {
     callValidationLimit();
   }, []);

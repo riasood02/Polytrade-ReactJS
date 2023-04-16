@@ -11,7 +11,8 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { APIFetchData } from "../../Utils/FetchAPI";
+import { APIFetcher } from "../../Utils/FetchAPI";
+import { BaseUrl } from "../../Data/Urls";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -23,6 +24,7 @@ ChartJS.register(
 );
 /**
  * Create Line Chart with the data fetched from API
+ * @param {(invoice:number)=>void} props.showtotalInvoice shows the total invoices funded
  */
 const LineChart = (props: { showtotalInvoice: (invoice: number) => void }) => {
   const [LineData, setLineData] = useState<{ [key: string]: any }>({
@@ -55,12 +57,18 @@ const LineChart = (props: { showtotalInvoice: (invoice: number) => void }) => {
       },
     },
   });
+
+  /**
+   * This takes the data out of the promise returned by fetching the API
+   * Manipulates the data according to the need
+   * Sets the variable
+   */
   useEffect(() => {
     let chartValues = new Map();
     let xVal: string[] = [];
     let yVal: Number[] = [];
     var totalInv = 0;
-    APIFetchData.then((res) => {
+    APIFetcher(`${BaseUrl}invoice-funded`).then((res) => {
       var apiData = res.data;
       const sortbyDate = (a: any, b: any) => {
         return (
@@ -100,16 +108,23 @@ const LineChart = (props: { showtotalInvoice: (invoice: number) => void }) => {
             {
               data: yVal,
               backgroundColor: "white",
-              borderColor: "grey",
+              borderColor: "rgb(178, 190, 181)",
+              pointBackgroundColor: "grey",
             },
           ],
         },
         options: {
           responsive: true,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
           scales: {
             y: {
               grid: {
                 display: false,
+                drawBorder: false,
               },
               ticks: {
                 display: false,

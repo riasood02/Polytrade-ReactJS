@@ -2,7 +2,7 @@ import React from "react";
 import { Container, Row } from "react-bootstrap";
 import TradeCard from "./TradeCard";
 /**
- * second grid
+ * Rewards Pool
  */
 const RewardsPool = () => {
   return (

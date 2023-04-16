@@ -9,6 +9,24 @@ import {
 } from "../../../Utils/SmartContractFunction";
 import "../../../style.css";
 import { addDollar, toDecimal } from "../../../Utils/NumberFormattingFunctions";
+import {
+  ALERT_MESSAGES,
+  ALERT_TYPE,
+  BALANCE,
+  BUTTONS,
+  ENTER_AMOUNT,
+  INPUT_VALIDATION,
+  TC,
+} from "../../../Data/Constants";
+
+/**
+ * Redeem
+ * @param {object} props Component props
+ * @param {string | null | undefined} props.currentAccount current wallet address
+ * @param {(message: string, type:string) => void} props.notify displays alert dialogue box
+ * @param {boolean} props.redeemDone is redeem done
+ * @param {(b:boolean) => void} props.setredeemDone sets bool to the redeem done variable
+ */
 const Redeem = (props: {
   currentAccount: string | null | undefined;
   notify: (message: string, type: any) => void;
@@ -22,11 +40,19 @@ const Redeem = (props: {
   const [errors, setErrors] = useState<any>({});
   const [isLend, setisLend] = useState<number>(0);
   const [isDisableRedeem, setisDisableRedeem] = useState<boolean>(true);
+
+  /**
+   * closes the modal
+   */
   const handleClose = () => {
     setShow(false);
     props.setredeemDone(false);
     setAmount(0);
   };
+
+  /**
+   * opens the modal
+   */
   const handleShow = () => setShow(true);
   const callGetDeposit = async () => {
     const result = await getDepositFunction(props.currentAccount);
@@ -34,19 +60,27 @@ const Redeem = (props: {
     setmyDeposit(response);
     console.log(myDeposit);
   };
+
+  /**
+   * when the input box values is changed
+   */
   const handleInputAmount = (event: any) => {
     setAmount(event.target.value);
     if (event.target.value === 0) {
       setisError(true);
-      setErrors({ ...errors, amount: "Cant be zero" });
+      setErrors({ ...errors, amount: INPUT_VALIDATION.NOT_EMPTY });
     } else if (event.target.value > Number(myDeposit)) {
       setisError(true);
-      setErrors({ ...errors, amount: "must be lower than balance" });
+      setErrors({ ...errors, amount: INPUT_VALIDATION.NOT_LOWER });
     } else {
       setisError(false);
       setErrors({ ...errors, amount: null });
     }
   };
+
+  /**
+   * handles the value when changed
+   */
   const handleChange = (event: any) => {
     if (event.target.checked) {
       setisDisableRedeem(false);
@@ -56,12 +90,16 @@ const Redeem = (props: {
       setisLend(0);
     }
   };
+
+  /**
+   * calls the claimusdc function when button clicked
+   */
   const handleSubmit = async (e: any) => {
     if (!isError && isLend === 1) {
       setErrors({ ...errors, checkbox: null });
       await redeemTSpiceBalance(amount * 1000000);
       props.setredeemDone(true);
-      props.notify("Withdrawn transaction submitted", "info");
+      props.notify(ALERT_MESSAGES.WITHDRAW, ALERT_TYPE.INFO);
     } else {
       setErrors({ ...errors, checkbox: "Cant be empty" });
     }
@@ -74,7 +112,7 @@ const Redeem = (props: {
   return (
     <>
       <div>
-        <PrimaryButton btnName="Redeem" onClick={handleShow} />
+        <PrimaryButton btnName={BUTTONS.REDEEM} onClick={handleShow} />
       </div>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header className="border-0" closeButton>
@@ -89,10 +127,10 @@ const Redeem = (props: {
           <Form>
             <Form.Group className="mb-3" controlId="Amount">
               <div className="d-flex justify-content-between">
-                <Form.Label>Enter Amount</Form.Label>
+                <Form.Label>{ENTER_AMOUNT}</Form.Label>
                 <Form.Group controlId="formBasicEmail">
                   <Form.Label className="text-muted">
-                    Wallet Balance:
+                    {BALANCE.WALLET}
                   </Form.Label>
 
                   <Form.Text>
@@ -127,7 +165,7 @@ const Redeem = (props: {
                 isInvalid={!!errors.checkbox}
               />
               <a className="text-dark" href="#">
-                Terms and Conditions
+                {TC}
               </a>
               <Form.Control.Feedback type="invalid">
                 {errors.checkbox}
@@ -142,7 +180,7 @@ const Redeem = (props: {
             disabled={isDisableRedeem}
             onClick={handleSubmit}
           >
-            Redeem
+            {BUTTONS.REDEEM}
           </Button>
         </Modal.Footer>
       </Modal>

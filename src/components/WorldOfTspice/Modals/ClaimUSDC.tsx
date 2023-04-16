@@ -3,13 +3,36 @@ import PrimaryButton from "../../../atoms/PrimaryButton";
 import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
 import tstable from "../../../svgs/T-Stable.svg";
-import { addUSDC, toDecimal } from "../../../Utils/NumberFormattingFunctions";
+import { toDecimal } from "../../../Utils/NumberFormattingFunctions";
 import {
   approveTspiceSpendingLimit,
   claimUSDC,
   getTUSDCBalance,
 } from "../../../Utils/SmartContractFunction";
 import { TUSDCEthers } from "../../../Utils/Contracts/TUSDCContract";
+import {
+  ALERT_MESSAGES,
+  ALERT_TYPE,
+  APPROVAL,
+  APPROVE_SPENDING_LIMIT,
+  BALANCE,
+  BUTTONS,
+  ENTER_AMOUNT,
+  INPUT_VALIDATION,
+  TC,
+  TOKEN_ADDRESS,
+} from "../../../Data/Constants";
+
+/**
+ * Claim USDC
+ * @param {object} props Component props
+ * @param {string | null | undefined} props.currentAccount current wallet address
+ * @param {(message: string, type:string) => void} props.notify displays alert dialogue box
+ * @param {boolean} props.redeemDone is redeem done
+ * @param {(b:boolean) => void} props.setredeemDone sets bool to the redeem done variable
+ * @param {boolean} props.claimDone is claim done
+ * @param {(b:boolean) => void} props.setclaimDone sets bool to the claim done variable
+ */
 const ClaimUSDC = (props: {
   currentAccount: string | null | undefined;
   notify: (message: string, type: any) => void;
@@ -28,25 +51,40 @@ const ClaimUSDC = (props: {
   const [approvalAmount, setapprovalAmount] = useState<number>(0);
   const [isDisableLend, setisDisableLend] = useState<boolean>(true);
   const [isDisableApprove, setisDisableApprove] = useState<boolean>(true);
+
+  /**
+   * closes the modal
+   */
   const handleClose = () => {
     setShow(false);
     props.setclaimDone(false);
   };
+
+  /**
+   * opens the modal
+   */
   const handleShow = () => setShow(true);
 
+  /**
+   * when the input box values is changed
+   */
   const handleInputAmount = (event: any) => {
     setAmount(event.target.value);
     if (event.target.value === " ") {
       setisError(true);
-      setErrors({ ...errors, amount: "Cant be empty" });
+      setErrors({ ...errors, amount: INPUT_VALIDATION.NOT_EMPTY });
     } else if (event.target.value > TUSDCBalance) {
       setisError(true);
-      setErrors({ ...errors, amount: "must be lower than balance" });
+      setErrors({ ...errors, amount: INPUT_VALIDATION.NOT_LOWER });
     } else {
       setisError(false);
       setErrors({ ...errors, amount: null });
     }
   };
+
+  /**
+   * handles the value when changed
+   */
   const handleChange = (event: any) => {
     if (event.target.checked) {
       setisDisableApprove(false);
@@ -57,55 +95,64 @@ const ClaimUSDC = (props: {
       setisLend(0);
     }
   };
+
+  /**
+   * calling the approve function when button clicked
+   */
   const onApprove = async (e: any) => {
-    await approveTspiceSpendingLimit(props.currentAccount, amount);
+    await approveTspiceSpendingLimit(amount);
     setisDisableApprove(true);
     setspin(true);
   };
 
+  /**
+   * calls the claimusdc function when button clicked
+   */
   const handleSubmit = async (e: any) => {
     if (!isError && isLend === 1) {
       setErrors({ ...errors, checkbox: null });
       await claimUSDC(amount);
-      props.notify("claimed USDC successfully", "success");
+      props.notify(ALERT_MESSAGES.CLAIM_USDC, ALERT_TYPE.SUCCESS);
       props.setclaimDone(true);
     } else {
       setErrors({ ...errors, checkbox: "Cant be empty" });
     }
   };
 
+  /**
+   * This detects the approval event when approval transaction is processed
+   */
   useEffect(() => {
-    TUSDCEthers.on("Approval", (owner: any, spender: any, value: number) => {
+    TUSDCEthers.on(APPROVAL, (owner: any, spender: any, value: number) => {
       let ApprovalEvent = {
         from: owner,
         to: spender,
         value: value,
       };
-      // console.log(ApprovalEvent);
-      // console.log(
-      //   props.currentAccount,
-      //   Number(amount),
-      //   toDecimal(ApprovalEvent.value, 6)
-      // );
       if (
         ApprovalEvent.from === props.currentAccount &&
-        ApprovalEvent.to === "0xA72AfE1Ac88fB999AeF61FBB866F8C4Ad6B25dDb" &&
+        ApprovalEvent.to === TOKEN_ADDRESS.TUSDC &&
         toDecimal(ApprovalEvent.value, 6) >= Number(amount)
       ) {
         setapprovalAmount(toDecimal(ApprovalEvent.value, 0));
         setisDisableLend(false);
         setisDisableApprove(true);
-        props.notify("approve transaction submitted", "info");
+        props.notify(ALERT_MESSAGES.APPROVE, ALERT_TYPE.INFO);
         setspin(false);
       }
     });
-  }, [amount, props.currentAccount]);
+  }, [props.currentAccount]);
+
+  /**
+   * this gets the Tspice balance
+   */
   const callgetTUSDCBalance = async () => {
     if (props.currentAccount !== undefined || null) {
       var response = await getTUSDCBalance(props.currentAccount);
       setTUSDCBalance(response);
     }
   };
+
   useEffect(() => {
     callgetTUSDCBalance();
   }, [props.currentAccount, props.redeemDone, props.claimDone]);
@@ -140,10 +187,10 @@ const ClaimUSDC = (props: {
           <Form>
             <Form.Group className="mb-3" controlId="Amount">
               <div className="d-flex justify-content-between">
-                <Form.Label>Enter Amount</Form.Label>
+                <Form.Label>{ENTER_AMOUNT}</Form.Label>
                 <Form.Group controlId="formBasicEmail">
                   <Form.Label className="text-muted">
-                    TSpice Balance:
+                    {BALANCE.TSPICE}
                   </Form.Label>
 
                   <Form.Text>
@@ -178,7 +225,7 @@ const ClaimUSDC = (props: {
                 isInvalid={!!errors.checkbox}
               />
               <a className="text-dark" href="#">
-                Terms and Conditions
+                {TC}
               </a>
               <Form.Control.Feedback type="invalid">
                 {errors.checkbox}
@@ -204,7 +251,7 @@ const ClaimUSDC = (props: {
                 animation="border"
               />
             )}
-            Approve Spending Limit
+            {APPROVE_SPENDING_LIMIT}
           </Button>
           <Button
             className="flex-fill button-dark rounded-pill px-4 py-1 fs-4"
@@ -212,7 +259,7 @@ const ClaimUSDC = (props: {
             disabled={isDisableLend}
             onClick={handleSubmit}
           >
-            Redeem
+            {BUTTONS.REDEEM}
           </Button>
         </Modal.Footer>
       </Modal>

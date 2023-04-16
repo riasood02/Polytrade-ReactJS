@@ -173,12 +173,20 @@ USDCDetails = {
     },
   ],
 };
+
+/**
+ * Contract Instance using ethers.js
+ */
 const provider = new ethers.providers.Web3Provider((window as any).ethereum);
-const bleh = new ethers.Contract(
+const USDCContractEthers = new ethers.Contract(
   USDCDetails.contractAddress,
   USDCDetails.abi,
   provider.getSigner()
 );
+
+/**
+ * Contract Instance using web3.js
+ */
 var web3 = new Web3((window as any).ethereum);
 
 var USDCContract: Contract = new web3.eth.Contract(
@@ -186,4 +194,4 @@ var USDCContract: Contract = new web3.eth.Contract(
   USDCDetails.contractAddress
 );
 
-export { USDCContract, bleh };
+export { USDCContract, USDCContractEthers };

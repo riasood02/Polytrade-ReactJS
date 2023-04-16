@@ -9,11 +9,28 @@ import {
   getUSDCBalance,
   sendUSDCtoLenderPool,
 } from "../../Utils/SmartContractFunction";
-import { bleh } from "../../Utils/Contracts/USDCTokenContract";
+import { USDCContractEthers } from "../../Utils/Contracts/USDCTokenContract";
 import "../../style.css";
+import {
+  ALERT_MESSAGES,
+  ALERT_TYPE,
+  APPROVAL,
+  APPROVE_SPENDING_LIMIT,
+  APR_VALUE,
+  ENTER_AMOUNT,
+  INPUT_VALIDATION,
+  POLYGON,
+  TC,
+  USDC,
+  TOKEN_ADDRESS,
+  VIEW_CONTRACT,
+  BALANCE,
+  BUTTONS,
+} from "../../Data/Constants";
+
 const LendToken = (props: {
   currentAccount: string | null | undefined;
-  notify: (message: string, type: any) => void;
+  notify: (message: string, type: string) => void;
 }) => {
   const [spin, setspin] = useState<boolean>(false);
   const [isDisableLend, setisDisableLend] = useState<boolean>(true);
@@ -27,11 +44,19 @@ const LendToken = (props: {
   const [approvalAmount, setapprovalAmount] = useState<number>(0);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const onApprove = async (e: any) => {
-    await approveSpendingLimit(props.currentAccount, amount);
+
+  /**
+   * calling the approve function when button clicked
+   */
+  const onApprove = async () => {
+    await approveSpendingLimit(amount);
     setisDisableApprove(true);
     setspin(true);
   };
+
+  /**
+   * handles the value when changed
+   */
   const handleChange = (event: any) => {
     if (event.target.checked) {
       setisDisableApprove(false);
@@ -42,6 +67,10 @@ const LendToken = (props: {
       setisLend(0);
     }
   };
+
+  /**
+   * gets the TSpice balance of the user
+   */
   useEffect(() => {
     const callgetUSDCBalance = async () => {
       if (props.currentAccount !== undefined || null) {
@@ -51,51 +80,66 @@ const LendToken = (props: {
     };
     callgetUSDCBalance();
   }, [props.currentAccount]);
-  const handleSubmit = async (e: any) => {
+
+  /**
+   * calls the send USDC to Lender Pool function when button clicked
+   */
+  const handleSubmit = async () => {
     if (!isError && isLend === 1) {
       setErrors({ ...errors, checkbox: null });
-      await sendUSDCtoLenderPool(props.currentAccount, amount);
-      props.notify("Deposit transaction submitted", "info");
+      await sendUSDCtoLenderPool(amount);
+      props.notify(ALERT_MESSAGES.DEPOSIT, ALERT_TYPE.INFO);
     } else {
       setErrors({ ...errors, checkbox: "Cant be empty" });
     }
   };
+
+  /**
+   * when the input box values is changed
+   */
   const handleInputAmount = (event: any) => {
     setAmount(event.target.value);
     if (event.target.value === " ") {
       setisError(true);
-      setErrors({ ...errors, amount: "Cant be empty" });
+      setErrors({ ...errors, amount: INPUT_VALIDATION.NOT_EMPTY });
     } else if (event.target.value < Number(100)) {
       setisError(true);
-      setErrors({ ...errors, amount: "must be greater than 100" });
+      setErrors({ ...errors, amount: INPUT_VALIDATION.GREATER_THAN });
     } else if (event.target.value > Number(USDCbal)) {
       setisError(true);
-      setErrors({ ...errors, amount: "must be lower than balance" });
+      setErrors({ ...errors, amount: INPUT_VALIDATION.NOT_LOWER });
     } else {
       setisError(false);
       setErrors({ ...errors, amount: null });
     }
   };
+
+  /**
+   * This detects the approval event when approval transaction is processed
+   */
   useEffect(() => {
-    bleh.on("Approval", (owner: any, spender: any, value: number) => {
-      let ApprovalEvent = {
-        from: owner,
-        to: spender,
-        value: value,
-      };
-      if (
-        ApprovalEvent.from === props.currentAccount &&
-        ApprovalEvent.to === "0x5AaA4e76cEbAbf2119fD88d86ec423ab01196d5A" &&
-        toDecimal(ApprovalEvent.value, 0) >= Number(amount)
-      ) {
-        setapprovalAmount(toDecimal(ApprovalEvent.value, 0));
-        setisDisableLend(false);
-        setisDisableApprove(true);
-        props.notify("approve transaction submitted", "info");
-        setspin(false);
+    USDCContractEthers.on(
+      APPROVAL,
+      (owner: any, spender: any, value: number) => {
+        let ApprovalEvent = {
+          from: owner,
+          to: spender,
+          value: value,
+        };
+        if (
+          ApprovalEvent.from === props.currentAccount &&
+          ApprovalEvent.to === TOKEN_ADDRESS.USDC &&
+          toDecimal(ApprovalEvent.value, 0) >= Number(amount)
+        ) {
+          setapprovalAmount(toDecimal(ApprovalEvent.value, 0));
+          setisDisableLend(false);
+          setisDisableApprove(true);
+          props.notify(ALERT_MESSAGES.APPROVE, ALERT_TYPE.INFO);
+          setspin(false);
+        }
       }
-    });
-  }, [bleh, amount, props.currentAccount]);
+    );
+  }, [props.currentAccount]);
 
   useEffect(() => {
     if (approvalAmount) {
@@ -108,20 +152,21 @@ const LendToken = (props: {
       }
     }
   }, [amount, props.currentAccount]);
+
   return (
     <div className="d-flex justify-content-between">
       <div className="d-flex flex-grow-1 mx-3 mt-2">
         <Image height={120} src={usdc} />
         <div className="mx-2 mt-3">
           <h1 className="lh-sm">
-            <b>24% APR*</b>
+            <b>{APR_VALUE}</b>
           </h1>
-          <p className="fs-5 text-muted lh-sm">Polygon</p>
+          <p className="fs-5 text-muted lh-sm">{POLYGON}</p>
         </div>
       </div>
       <div className="d-flex m-4 gap-5 align-items-center">
         <a href="#" className="link-style">
-          <h4>View Contracts</h4>
+          <h4>{VIEW_CONTRACT}</h4>
         </a>
         <PrimaryButton btnName="Lend Now" onClick={handleShow} />
 
@@ -130,7 +175,7 @@ const LendToken = (props: {
             <Modal.Title className="modalHeader mt-4">
               <div className="d-flex align-items-center bg-light p-2  rounded-pill">
                 <Image src={usdc} />
-                <h1 className="mb-0">USDC</h1>
+                <h1 className="mb-0">{USDC}</h1>
               </div>
             </Modal.Title>
           </Modal.Header>
@@ -138,10 +183,10 @@ const LendToken = (props: {
             <Form>
               <Form.Group className="mb-3" controlId="Amount">
                 <div className="d-flex justify-content-between">
-                  <Form.Label>Enter Amount</Form.Label>
+                  <Form.Label>{ENTER_AMOUNT}</Form.Label>
                   <Form.Group controlId="formBasicEmail">
                     <Form.Label className="text-muted">
-                      Wallet Balance:
+                      {BALANCE.WALLET}
                     </Form.Label>
 
                     <Form.Text>
@@ -176,7 +221,7 @@ const LendToken = (props: {
                   isInvalid={!!errors.checkbox}
                 />
                 <a className="text-dark" href="#">
-                  Terms and Conditions
+                  {TC}
                 </a>
                 <Form.Control.Feedback type="invalid">
                   {errors.checkbox}
@@ -202,7 +247,7 @@ const LendToken = (props: {
                   animation="border"
                 />
               )}
-              Approve Spending Limit
+              {APPROVE_SPENDING_LIMIT}
             </Button>
             <Button
               className="flex-fill button-dark rounded-pill px-4 py-1 fs-4"
@@ -210,7 +255,7 @@ const LendToken = (props: {
               disabled={isDisableLend}
               onClick={handleSubmit}
             >
-              Lend
+              {BUTTONS.LEND}
             </Button>
           </Modal.Footer>
         </Modal>

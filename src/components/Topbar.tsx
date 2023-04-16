@@ -13,6 +13,12 @@ import meta from "../svgs/metamask.svg";
 import Web3 from "web3";
 import { switchNetwork } from "../Utils/SwitchNetwork";
 import { addressShortener } from "../Utils/NumberFormattingFunctions";
+import {
+  ALERT_MESSAGES,
+  ALERT_TYPE,
+  BUTTONS,
+  DROPDOWNS,
+} from "../Data/Constants";
 
 /**
  * Top Navigation Bar
@@ -29,7 +35,7 @@ const Topbar = (props: {
   meta: boolean;
   showMeta: (b: boolean) => void;
   showcurrentBalance: (bal: string | undefined) => void;
-  notify: (type: any, message: string) => void;
+  notify: (message: string, type: string) => void;
 }) => {
   const [isConnected, setisConnected] = useState(false);
   const [currentAccount, setcurrentAccount] = useState<string>("none");
@@ -42,7 +48,6 @@ const Topbar = (props: {
    * Setting states on wallet connect
    * @param {any} provider displays current wallet balance
    */
-
   const onConnecting = async (provider: any) => {
     const web3 = new Web3(provider);
     const accounts: string[] = await web3!.eth.getAccounts();
@@ -50,7 +55,7 @@ const Topbar = (props: {
     const balance = await web3!.eth.getBalance(accounts[0]);
     let mainBalance = web3!.utils.fromWei(balance);
     if (accounts.length === 0) {
-      props.notify("Metamask not connected", "warn");
+      props.notify(ALERT_MESSAGES.META_NOT_CONNECTED, ALERT_TYPE.WARN);
     } else if (accounts[0] !== currentAccount) {
       setProvider(provider);
       setWeb3(web3);
@@ -60,7 +65,7 @@ const Topbar = (props: {
       setcurrentBalance(mainBalance);
       props.showcurrentBalance(mainBalance);
       props.showMeta(true);
-      props.notify("Wallet Connected", "success");
+      props.notify(ALERT_MESSAGES.META_CONNECTED, ALERT_TYPE.SUCCESS);
       props.showCurrentAccount(accounts[0]);
     }
   };
@@ -85,7 +90,7 @@ const Topbar = (props: {
     props.showcurrentBalance(mainBalance);
     props.showCurrentAccount(account);
     props.showMeta(true);
-    props.notify("Metamask Wallet Account changed", "info");
+    props.notify(ALERT_MESSAGES.ACCOUNT_CHANGED, ALERT_TYPE.INFO);
   }
 
   (window as any).ethereum.on("accountsChanged", function (accounts: string[]) {
@@ -99,7 +104,7 @@ const Topbar = (props: {
     const handleChainChanged = async () => {
       const web3ChainId = await web3!.eth.getChainId();
       if (web3ChainId !== 80001) {
-        props.notify("Connected to wrong network", "warn");
+        props.notify(ALERT_MESSAGES.WRONG_CHAIN, ALERT_TYPE.WARN);
         switchNetwork(80001);
       }
       setChainId(web3ChainId);
@@ -121,12 +126,12 @@ const Topbar = (props: {
     setisConnected(false);
     setcurrentAccount("none");
     props.showcurrentBalance("0");
-    props.notify("Wallet Disconnected", "info");
+    props.notify(ALERT_MESSAGES.DISCONNECTED, ALERT_TYPE.INFO);
     props.showMeta(false);
   };
   return (
     <Navbar
-      className="d-flex justify-content-between align-items-center py-5"
+      className="d-flex justify-content-between align-items-center py-4"
       bg="white"
       expand="lg"
     >
@@ -137,7 +142,7 @@ const Topbar = (props: {
               className="fas fa-align-left primary-text fs-4 me-auto my-2 my-lg-0 "
               id="menu-toggle"
             ></i>
-            <h1>Dashboard</h1>
+            <h2>Dashboard</h2>
           </Navbar.Brand>
         </div>
         <div>
@@ -150,10 +155,10 @@ const Topbar = (props: {
               <Dropdown>
                 <Dropdown.Toggle
                   variant="default"
-                  className="text-muted fw-normal fs-3 border-0"
+                  className="text-muted fw-normal fs-5 border-0"
                   id="dropdown-basic"
                 >
-                  Audited by
+                  {DROPDOWNS.AUDITED}
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu className="rounded-4 w-100">
@@ -191,13 +196,13 @@ const Topbar = (props: {
                   }}
                 >
                   <div className="d-flex align-items-center py-3 px-5">
-                    <p className="mb-0 mx-2 fs-3">Account</p>
+                    <p className="mb-0 mx-2 fs-4">Account</p>
                     <Image
                       className="mx-1"
                       style={{ height: "20px" }}
                       src={meta}
                     />
-                    <div className="text-muted fs-4">
+                    <div className="text-muted fs-5">
                       <>{addressShortener(currentAccount)}</>
                     </div>
                     <div>
@@ -211,7 +216,7 @@ const Topbar = (props: {
 
                   <Dropdown.Menu className="rounded-4 w-100">
                     <Dropdown.Item onClick={onLogout}>
-                      <h3 className="text-bold">Disconnect</h3>
+                      <h4 className="text-bold">{BUTTONS.DISCONNECT}</h4>
                     </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>

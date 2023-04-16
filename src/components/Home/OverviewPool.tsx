@@ -1,69 +1,47 @@
 import React, { useState } from "react";
 import "../../style.css";
-import {
-  Button,
-  ButtonGroup,
-  Col,
-  Dropdown,
-  DropdownButton,
-} from "react-bootstrap";
-import LineChart from "./LineChart";
+import { Col, Dropdown } from "react-bootstrap";
 import BeforeKYC from "./BeforeKYC";
 import AfterKYC from "./AfterKYC";
 import { addDollar } from "../../Utils/NumberFormattingFunctions";
-/**
- * Liquidity card
- * @param {object} props Component props
- * @param {string} props.FirstText headline
- * @param {string} props.SecondText value
- */
-const LiquidityCard = (props: {
-  FirstText: string;
-  SecondText: string;
-  showtotalInvoice: (invoice: number) => void;
-}) => {
-  return (
-    <Col md={12} className="bg-white p-3 rounded-5 mt-5">
-      <div className="d-flex align-items-start">
-        <p className="fs-4 lh-sm text-muted">{props.FirstText}</p>
-      </div>
-      <div className="d-flex align-items-start">
-        <h3 className="lh-sm">
-          <b>{props.SecondText}</b>
-        </h3>
-      </div>
-      <LineChart showtotalInvoice={props.showtotalInvoice} />
-    </Col>
-  );
-};
+import LiquidityCard from "./LiquidityCard";
 
 /**
  * OverView Pool
  * @param {object} props Component props
  * @param {string | null | undefined} props.currentAccount current wallet address
  * @param {boolean} props.meta is metamask connected
+ * @param {string} props.myDeposit gets the my deposits of the user
+ * @param {string} props.validateLimit gets validation limit
  */
 const OverviewPool = (props: {
   currentAccount: string | null | undefined;
   meta: boolean;
+  myDeposit: string;
+  validateLimit: string;
 }) => {
   const [totalInvoice, settotalInvoice] = useState<number>();
+
+  /**
+   * Sets the total invoices funded
+   */
   const showtotalInvoice = (invoice: number) => {
     settotalInvoice(invoice);
   };
+
   return (
     <Col md={4}>
-      <div className="d-flex align-items-center justify-content-between">
+      <div className="d-flex align-items-center justify-content-between mt-3">
         <div className="bd-highlight">
-          <h3>
+          <h4>
             <b>Overview</b>
-          </h3>
+          </h4>
         </div>
         <div className="p-2 bd-highlight">
           <Dropdown>
             <Dropdown.Toggle
               variant="default"
-              className="fw-normal fs-3 border-0 bg-white rounded-pill px-5"
+              className="fw-normal fs-5 border-0 bg-white rounded-pill px-5"
               id="dropdown-basic"
             >
               USD
@@ -83,7 +61,7 @@ const OverviewPool = (props: {
           </Dropdown>
         </div>
       </div>
-      <div className="mt-5">
+      <div>
         <LiquidityCard
           FirstText="Total Polytrade Liquidity"
           SecondText="$17,683,857,723"
@@ -95,9 +73,14 @@ const OverviewPool = (props: {
           showtotalInvoice={showtotalInvoice}
         ></LiquidityCard>
         {props.meta ? (
-          <AfterKYC currentAccount={props.currentAccount} meta={props.meta} />
+          <AfterKYC
+            currentAccount={props.currentAccount}
+            meta={props.meta}
+            myDeposit={props.myDeposit}
+            validateLimit={props.validateLimit}
+          />
         ) : (
-          <BeforeKYC />
+          <BeforeKYC validateLimit={props.validateLimit} />
         )}
       </div>
     </Col>

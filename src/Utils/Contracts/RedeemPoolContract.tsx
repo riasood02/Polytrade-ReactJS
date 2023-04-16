@@ -209,6 +209,9 @@ RedeemPoolDetails = {
   ],
 };
 
+/**
+ * Contract Instance using ethers.js
+ */
 const provider = new ethers.providers.Web3Provider((window as any).ethereum);
 const RedeemPoolEthers = new ethers.Contract(
   RedeemPoolDetails.contractAddress,
@@ -216,6 +219,9 @@ const RedeemPoolEthers = new ethers.Contract(
   provider.getSigner()
 );
 
+/**
+ * Contract Instance using web3.js
+ */
 var web3 = new Web3((window as any).ethereum);
 
 var RedeemPoolContract: Contract = new web3.eth.Contract(

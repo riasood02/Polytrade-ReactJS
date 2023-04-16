@@ -1,3 +1,6 @@
+/**
+ * Detects the provider and sets the provider if not detected
+ */
 export const detectProvider = () => {
   let provider;
   if ((window as any).ethereum) {

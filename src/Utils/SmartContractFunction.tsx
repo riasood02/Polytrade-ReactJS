@@ -1,26 +1,25 @@
 import StableContract from "./Contracts/StableContract";
 import RewardContract from "./Contracts/RewardContract";
 import PoolLiquidityContract from "./Contracts/PoolLiquidityContract";
-import { BigNumberish, ethers } from "ethers";
 import {
   AddCommas,
-  addDollar,
   formatAsPercent,
+  toDecimal,
 } from "./NumberFormattingFunctions";
 import KYCContract from "./Contracts/KYCVerificationContract";
 import GetDepositContract from "./Contracts/GetDepositContract";
-import { LenderPoolContract, blehLender } from "./Contracts/LenderPoolContract";
-import { USDCContract, bleh } from "./Contracts/USDCTokenContract";
+import { blehLender } from "./Contracts/LenderPoolContract";
+import {
+  USDCContract,
+  USDCContractEthers,
+} from "./Contracts/USDCTokenContract";
 import { formatUnits } from "ethers/lib/utils";
 import { TUSDCContract, TUSDCEthers } from "./Contracts/TUSDCContract";
-import {
-  RedeemPoolContract,
-  RedeemPoolEthers,
-} from "./Contracts/RedeemPoolContract";
+import { RedeemPoolEthers } from "./Contracts/RedeemPoolContract";
 
-const toDecimal = (value: BigNumberish, decimal: number) =>
-  Number(formatUnits(value, decimal));
-
+/**
+ * gets the stable balance
+ */
 export const getStableBalance = async () => {
   let response = await StableContract.methods.getReward().call();
   var balance = toDecimal(response, 2);
@@ -28,6 +27,9 @@ export const getStableBalance = async () => {
   return bal;
 };
 
+/**
+ * gets the reward balance
+ */
 export const getRewardBalance = async () => {
   let response = await RewardContract.methods.getReward().call();
   const balance = toDecimal(response, 4);
@@ -35,6 +37,9 @@ export const getRewardBalance = async () => {
   return bal;
 };
 
+/**
+ * gets the current pool liquidity value from the smart contract
+ */
 export const getCurrentPoolLiquidity = async () => {
   let response = await PoolLiquidityContract.methods.getBalance().call();
   formatUnits(response, 6);
@@ -42,10 +47,19 @@ export const getCurrentPoolLiquidity = async () => {
   return balance;
 };
 
+/**
+ * checks if user is KYC Verified or not
+ * @param {string} address wallet address
+ */
 export const getKYCValidation = async (address: string | null | undefined) => {
   let response = await KYCContract.methods.isValid(address).call();
   return response;
 };
+
+/**
+ * gets the KYC provider for the user
+ * @param {string} address wallet address
+ */
 export const getKYCProviderInfo = async (
   address: string | null | undefined
 ) => {
@@ -53,77 +67,89 @@ export const getKYCProviderInfo = async (
   return response.toString();
 };
 
+/**
+ * gets my deposits for the user
+ * @param {string} address wallet address
+ */
 export const getDepositFunction = async (
   address: string | null | undefined
 ) => {
   let response = await GetDepositContract.methods.getDeposit(address).call();
   return response;
 };
-export const approveSpendingLimit = async (
-  address: string | null | undefined,
-  amount: number
-) => {
-  let approval = await bleh.approve(
+
+/**
+ * calls the approval function to set the approval limit for spending token money
+ * @param {number} amount wallet address
+ */
+export const approveSpendingLimit = async (amount: number) => {
+  let approval = await USDCContractEthers.approve(
     "0x5AaA4e76cEbAbf2119fD88d86ec423ab01196d5A",
     amount
   );
 };
-export const sendUSDCtoLenderPool = async (
-  address: string | null | undefined,
-  amount: number
-) => {
+
+/**
+ * write function to lend the usdc token money to the lender pool
+ * @param {number} amount wallet address
+ */
+export const sendUSDCtoLenderPool = async (amount: number) => {
   let response = await blehLender.deposit(amount);
-  // console.log(response);
 };
 
+/**
+ * gets the value of the usdc token for a user
+ * @param {string} address wallet address
+ */
 export const getUSDCBalance = async (address: string | null | undefined) => {
   let response = await USDCContract.methods.balanceOf(address).call();
   const USDCBalance = toDecimal(response, 6);
   return USDCBalance;
 };
 
+/**
+ * returns the validation limit
+ */
 export const validationLimit = async () => {
   let response = await KYCContract.methods.validationLimit().call();
   const validateLimit = toDecimal(response, 6);
   return "$ " + validateLimit.toString();
 };
 
+/**
+ * write function to redeem tspice to our wallet account
+ * @param {number} amount wallet address
+ */
 export const redeemTSpiceBalance = async (amount: number) => {
   let response = await blehLender.withdrawDeposit(amount);
 };
 
+/**
+ * returns the Tspice balance of the user
+ * @param {string} address wallet address
+ */
 export const getTUSDCBalance = async (address: string | null | undefined) => {
   let response = await TUSDCContract.methods.balanceOf(address).call();
   const USDCBalance = toDecimal(response, 6);
   return USDCBalance;
 };
+
+/**
+ * write function to get the stable money for the tsoice balance in users wallet
+ * @param {amount} amount wallet address
+ */
 export const claimUSDC = async (amount: number) => {
   let response = await RedeemPoolEthers.redeemStable(amount * 1000000);
   console.log(response);
 };
-export const approveTspiceSpendingLimit = async (
-  address: string | null | undefined,
-  amount: number
-) => {
+
+/**
+ * calls the approval function to set the approval limit for spending Tspice balance
+ * @param {number} amount wallet address
+ */
+export const approveTspiceSpendingLimit = async (amount: number) => {
   let approval = await TUSDCEthers.approve(
     "0xA72AfE1Ac88fB999AeF61FBB866F8C4Ad6B25dDb",
     amount * 1000000
   );
 };
-// export const redeemTspiceMetamask = async (coin, amount) => {
-//   try {
-//     const contract = WALLET_HELPERS.getSignerContract(
-//       coin.LENDER_POOL.ADDRESS,
-//       coin.LENDER_POOL.ABI,
-//     );
-
-//     const redeemResult = await contract.withdrawDeposit(amount);
-//     return redeemResult.hash;
-//   } catch (error) {
-//     if (error.code === WALLET.CANCEL_CODE) {
-//       return { code: WALLET.CANCEL_CODE };
-//     }
-
-//     return '';
-//   }
-// };

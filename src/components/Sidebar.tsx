@@ -65,21 +65,21 @@ const Sidebar = () => {
         <div>
           <Image src={logo} alt="logo"></Image>
         </div>
-        <div>
+        <div className="mb-5">
           <Image src={symbol} alt="symbol"></Image>
         </div>
       </a>
 
-      <Nav defaultActiveKey="/home" className="flex-column gap-4">
+      <Nav defaultActiveKey="/home" className="flex-column gap-1">
         {links.map((links) => (
-          <div className="mt-4" key={links.id}>
+          <div key={links.id}>
             <Link
               to={links.link}
-              className="link-style fs-5 text-muted fw-normal"
+              className="link-style fs-6 text-muted fw-normal"
             >
-              <Image src={links.image} alt={links.alt}></Image>
+              <Image className="mx-3" src={links.image} alt={links.alt}></Image>
               <br />
-              {links.text}
+              <p className="fs-6 mx-1">{links.text}</p>
             </Link>
           </div>
         ))}

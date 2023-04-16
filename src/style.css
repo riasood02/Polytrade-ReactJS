@@ -24,10 +24,17 @@
       border: none;
     }
 .radio-group-button-left {
+  width: fit-content;
+  text-align: center;
+  vertical-align: middle;
     border-top-left-radius: 46px;
     border-bottom-left-radius: 46px;
+    border-top-right-radius: 46px;
+    border-bottom-right-radius: 46px;
 }
 .radio-group-button-right {
+  border-top-left-radius: 46px;
+    border-bottom-left-radius: 46px;
     border-top-right-radius: 46px;
     border-bottom-right-radius: 46px;
 }
@@ -55,7 +62,7 @@
       #a2a5f4 52.25%,
       #98b8ef 105.13%
     );
-    padding: 30px;
+    padding: 20px;
     border-radius: 45px;
   }
   .modalHeader {

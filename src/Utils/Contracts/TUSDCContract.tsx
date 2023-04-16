@@ -320,12 +320,20 @@ TUSDCDetails = {
     },
   ],
 };
+
+/**
+ * Contract Instance using ethers.js
+ */
 const provider = new ethers.providers.Web3Provider((window as any).ethereum);
 const TUSDCEthers = new ethers.Contract(
   TUSDCDetails.contractAddress,
   TUSDCDetails.abi,
   provider.getSigner()
 );
+
+/**
+ * Contract Instance using web3.js
+ */
 var web3 = new Web3((window as any).ethereum);
 
 var TUSDCContract: Contract = new web3.eth.Contract(

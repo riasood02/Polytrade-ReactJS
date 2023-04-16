@@ -13,39 +13,32 @@ import React, { useEffect, useState } from "react";
 import "../../style.css";
 import {
   getCurrentPoolLiquidity,
-  getDepositFunction,
   getRewardBalance,
   getStableBalance,
 } from "../../Utils/SmartContractFunction";
-import { addDollar, toDecimal } from "../../Utils/NumberFormattingFunctions";
 import RewardsCalculate from "./RewardsCalculate";
 import LendToken from "./LendToken";
+import { INFO_LINE } from "../../Data/Constants";
 
 /**
  * Lender Pool
  * @param {object} props Component props
  * @param {string | undefined} props.currentAccount current wallet account
- * @param {}
+ * @param {(message: string, type:string) => void} props.notify displays alert dialogue box
+ * @param {string} props.myDeposit gets the deposits of the user
  */
 const LenderPool = (props: {
   currentAccount: string | null | undefined;
-  notify: (message: string, type: any) => void;
+  notify: (message: string, type: string) => void;
+  myDeposit: string;
 }) => {
   const [stableBalance, setStableBalance] = useState<string>();
   const [rewardBalance, setRewardBalance] = useState<string>();
   const [PoolLiquidity, setPoolLiquidity] = useState<string>();
-  const [myDeposit, setmyDeposit] = useState<string>();
 
-  const callGetDeposit = async () => {
-    const result = await getDepositFunction(props.currentAccount);
-    const response = toDecimal(result, 6);
-    setmyDeposit(addDollar(response));
-  };
-
-  useEffect(() => {
-    callGetDeposit();
-  }, [props.currentAccount]);
-
+  /**
+   * Calculates all the values of the Lender Pool and sets their variables
+   */
   useEffect(() => {
     const callStableBalance = async () => {
       const result = await getStableBalance();
@@ -70,10 +63,10 @@ const LenderPool = (props: {
   return (
     <Col sm={12} md={8} className="mt-3">
       <RewardsCalculate />
-      <div className="my-5 bg-white mx-2 rounded-5 p-5">
+      <div className="my-4 bg-white mx-1 rounded-5 p-3">
         <LendToken
-          notify={props.notify}
           currentAccount={props.currentAccount}
+          notify={props.notify}
         />
         <Container className="py-2 mt-4">
           <Row className="gy-3 gx-3 mx-1">
@@ -107,16 +100,14 @@ const LenderPool = (props: {
               />
               <PoolCard
                 image={tstable}
-                FirstText={myDeposit}
+                FirstText={props.myDeposit}
                 SecondText="T-Stable Balance"
               />
             </div>
           </Row>
           <div className="d-flex gap-1 align-items-center m-3">
             <Image src={info} />
-            <p className="fs-6 mb-0">
-              Deposit limit will be 1000 USDT if you didn't verify KYC
-            </p>
+            <p className="fs-6 mb-0 text-muted">{INFO_LINE}</p>
           </div>
         </Container>
       </div>

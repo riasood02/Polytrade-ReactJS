@@ -30,4 +30,5 @@ export const HistoryInfo = () => {
       data.push(item);
     }
   });
+  return data;
 };

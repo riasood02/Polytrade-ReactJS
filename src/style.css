@@ -1,0 +1,115 @@
+.app {
+    text-align: center;
+  }
+.main-body {
+    background-color: rgb(244,248,251);
+    min-height: calculateNewValue(100vh-115px);
+    color: rgb(10,11,32);
+    border-top-left-radius: 46px;
+
+}
+
+
+.button-light {
+    color: rgb(10,11,32);
+    background-color: rgb(244,248,251);
+    font-weight: 500;
+    border: none;
+
+}
+.button-light[disabled] {
+      background-color: rgb(244,248,251);
+      color: grey;
+      font-weight: 500;
+      border: none;
+    }
+.radio-group-button-left {
+  width: fit-content;
+  text-align: center;
+  vertical-align: middle;
+    border-top-left-radius: 46px;
+    border-bottom-left-radius: 46px;
+    border-top-right-radius: 46px;
+    border-bottom-right-radius: 46px;
+}
+.radio-group-button-right {
+  border-top-left-radius: 46px;
+    border-bottom-left-radius: 46px;
+    border-top-right-radius: 46px;
+    border-bottom-right-radius: 46px;
+}
+.link-style {
+    text-decoration: none;
+    font-weight: 500;
+}
+.button-dark {
+    background-color: rgb(118,140,250);
+    font-weight: 700;
+    min-width: 150px;
+    color: white;
+    border: none;
+}
+.button-dark[disabled] {
+      background-color: rgb(151, 166, 241);
+      color: white;
+      font-weight: 700;
+      border: none;
+    }
+.circle-icon {
+    background: linear-gradient(
+      46.48deg,
+      #edddeb -2.88%,
+      #a2a5f4 52.25%,
+      #98b8ef 105.13%
+    );
+    padding: 20px;
+    border-radius: 45px;
+  }
+  .modalHeader {
+    margin: 0 auto;
+    height: 110px;
+    background: white;
+    overflow: hidden;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 30px;
+  }
+.modal-dialogue{
+  -webkit-border-radius: 200px;
+  -moz-border-radius: 200px;
+   border-radius: 200px;
+}
+table {
+  border-collapse: separate;
+  border-spacing: 0 30px;
+}
+/* // Set border-radius on the top-left and bottom-left of the first table data on the table row */
+td:first-child {
+  border-radius: 30px 0 0 30px;
+}
+
+/* // Set border-radius on the top-right and bottom-right of the last table data on the table row */
+td:last-child {
+  border-radius: 0 30px 30px 0;
+}
+.APR {
+  color: rgb(118,140,250);
+  font-weight: 450;
+}
+.statusButton {
+  background-color: lightgrey;
+  border-radius: 30px;
+  padding: 7px 15px;
+  color: black;
+  font-size: 18;
+}
+th{
+  text-align:left;
+}
+td {
+  font-weight: 50;
+  text-align: left;
+  vertical-align: middle;
+}
+thead {
+  border-bottom-color: white;
+}
